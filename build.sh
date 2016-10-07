@@ -2,6 +2,8 @@
 
 cd `dirname $0`/
 
-fileName="$1.cpp"
+name=$1
+inputName=$name".cpp"
+outputName=$name".out"
 
-g++ $fileName -framework OpenGL -framework GLUT
+g++ $inputName -framework OpenGL -framework GLUT -o $outputName
