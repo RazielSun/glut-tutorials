@@ -39,10 +39,9 @@ void init()
 		exit(1);
 	}
 
-	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-	glClearDepth(1.0);
-	glDepthFunc(GL_LESS);
-	glEnable(GL_DEPTH_TEST);
+	// glClearDepth(1.0);
+	// glDepthFunc(GL_LESS);
+	// glEnable(GL_DEPTH_TEST);
 	// glShadeModel(GL_SMOOTH);
 	// glMatrixMode(GL_PROJECTION);
 	// glLoadIdentity();
@@ -67,26 +66,34 @@ void createContext ()
 	glGenBuffers(1, &vbo);
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
 void render ()
 {
+	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 	glClear(GL_COLOR_BUFFER_BIT);
 
-	glEnableVertexAttribArray(0);
-	glBindBuffer(GL_ARRAY_BUFFER, vbo);
-	glVertexAttribPointer(
-	   0,                  	// attribute 0. No particular reason for 0, but must match the layout in the shader.
-	   3,                  	// size
-	   GL_FLOAT,           	// type
-	   GL_FALSE,           	// normalized?
-	   0,                  	// stride
-	   0            		// array buffer offset
-	);
-	glDrawArrays(GL_POINTS, 0, 3); //GL_TRIANGLES
-	glDisableVertexAttribArray(0);
+	// glEnableVertexAttribArray(0);
+	// glBindBuffer(GL_ARRAY_BUFFER, vbo);
+	// glVertexAttribPointer(
+	//    0,                  	// attribute 0. No particular reason for 0, but must match the layout in the shader.
+	//    3,                  	// size
+	//    GL_FLOAT,           	// type
+	//    GL_FALSE,           	// normalized?
+	//    0,                  	// stride
+	//    0            		// array buffer offset
+	// );
+	// glDrawArrays(GL_TRIANGLES, 0, 3);
+	// glDisableVertexAttribArray(0);
 
-	glFlush();
+	glBegin( GL_TRIANGLES );            /* Drawing Using Triangles */
+      glVertex3f(  0.0f,  1.0f, 0.0f ); /* Top */
+      glVertex3f( -1.0f, -1.0f, 0.0f ); /* Bottom Left */
+      glVertex3f(  1.0f, -1.0f, 0.0f ); /* Bottom Right */
+    glEnd( );  
+
+	// glFlush();
 }
 
 int main (int argc, char *argv[])

@@ -6,4 +6,4 @@ name=$1
 inputName=$name".cpp"
 outputName=$name".out"
 
-g++ $inputName -framework OpenGL -framework GLUT -o $outputName -Wno-deprecated
+g++ $inputName -lGLEW -framework OpenGL -framework GLUT -o $outputName -Wno-deprecated
