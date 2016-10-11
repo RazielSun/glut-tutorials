@@ -1,92 +1,145 @@
+#include <SDL2/SDL.h>
 
+#include <OpenGL/gl.h>
+#include <OpenGL/glu.h>
 
-#include <stdio.h>
-#include <GL/glew.h>
+#ifdef __APPLE__
+#define glGenVertexArrays glGenVertexArraysAPPLE
+#define glBindVertexArray glBindVertexArrayAPPLE
+#define glDeleteVertexArrays glDeleteVertexArraysAPPLE
+#endif
 
-// #include <OpenGL/gl.h>
-// #include <OpenGL/glu.h>
-#include <GLUT/glut.h>
-// #include <GL/freeglut.h>
-// #include "math_3d.h"
+#include <iostream>
+using namespace std;
 
+SDL_Window *window;
 
-static void Render(void) {
-	GLuint VBO;
+const int width = 640;
+const int height = 480;
 
-	GLfloat Vertices[] = {
-	    -0.5f, -0.5f, 0.0f,
-	     0.5f, -0.5f, 0.0f,
-	     0.0f,  0.5f, 0.0f
-	}; 
-	
-	glGenBuffers(1, &VBO);
-	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(Vertices[0]*9), &Vertices[0], GL_STATIC_DRAW);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-	glClear(GL_COLOR_BUFFER_BIT);
-
-	glEnableVertexAttribArray(0);
-	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), 0);
-
-	glDrawArrays(GL_TRIANGLES, 0, 3);
-	
-	glDisableVertexAttribArray(0);
-	 
-	glutSwapBuffers();
-}
-
-GLuint dVBO = 0;
-
-void DotRender() {
-	glClear(GL_COLOR_BUFFER_BIT);
-
-	glEnableVertexAttribArray(0);
-	glBindBuffer(GL_ARRAY_BUFFER, dVBO);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
-
-	glDrawArrays(GL_POINTS, 0, 1);
-	
-	glDisableVertexAttribArray(0);
-	 
-	glutSwapBuffers();
-}
-
-void CreateDot() {
-	GLfloat Vertices[] = {
-	    -0.5f, -0.5f, 0.0f
-	}; 
-	
-	glGenBuffers(1, &dVBO);
-	glBindBuffer(GL_ARRAY_BUFFER, dVBO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(Vertices), Vertices, GL_STATIC_DRAW);
-}
-
-int main(int argc, char** argv) {
-	glutInit(&argc, argv);
-	glutInitDisplayMode(GLUT_DOUBLE|GLUT_RGBA);
-	glutInitWindowSize(1024, 768); 
-	glutInitWindowPosition(100, 100);
-	glutCreateWindow("Tutorial 03");
-
-	// glutDisplayFunc(Render);
-	glutDisplayFunc(DotRender);
-
-	glewExperimental = GL_TRUE;
-	GLenum res = glewInit();
-	if (res != GLEW_OK) {
-	    fprintf(stderr, "Error: '%s'\n", glewGetErrorString(res));
-	    return 1;
+void init()
+{
+	if ( SDL_Init(SDL_INIT_VIDEO) < 0 )
+	{
+		cout << "Unable to init SDL, error: " << SDL_GetError() << endl;
+		exit(1);
 	}
 
-	printf("GL version: %s\n", glGetString(GL_VERSION));
+	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
+	SDL_GL_SetAttribute(SDL_GL_RED_SIZE, 5);
+	SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, 6);
+	SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, 5);
 
-	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+	window = SDL_CreateWindow("Sample SDL2", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL);
 
-	CreateDot();
-	
-	glutMainLoop();
+	SDL_GLContext glcontext = SDL_GL_CreateContext(window); // создаем контекст OpenGL
 
+	if (window == NULL)
+	{
+		exit(1);
+	}
+
+	// glClearDepth(1.0);
+	// glDepthFunc(GL_LESS);
+	// glEnable(GL_DEPTH_TEST);
+	// glShadeModel(GL_SMOOTH);
+	// glMatrixMode(GL_PROJECTION);
+	// glLoadIdentity();
+	// gluPerspective(45.0f, (float) width / (float) height, 0.1f, 100.0f);
+	// glMatrixMode(GL_MODELVIEW);
+}
+
+GLuint vao;
+GLuint vbo;
+
+static const GLfloat vertices[] = {
+	   -1.0f, -1.0f, 0.0f,
+	   1.0f, -1.0f, 0.0f,
+	   0.0f,  1.0f, 0.0f,
+	};
+
+void createContext ()
+{
+	// glFrontFace(GL_CW);
+
+	glGenVertexArrays(1, &vao);
+	glBindVertexArray(vao);
+
+	glGenBuffers(1, &vbo);
+	glBindBuffer(GL_ARRAY_BUFFER, vbo);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+	// glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+	printf("Sizeof vertices: %lu\nSizeof GLfloat: %lu\n", sizeof(vertices), sizeof(GLfloat));
+}
+
+void render ()
+{
+	// glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+	glClear(GL_COLOR_BUFFER_BIT);
+
+	glEnableClientState(GL_VERTEX_ARRAY);
+	glBindBuffer(GL_ARRAY_BUFFER, vbo);
+	glVertexPointer(3, GL_FLOAT, 0, 0);
+	glDrawArrays(GL_TRIANGLES, 0, 3);
+	glDisableClientState(GL_VERTEX_ARRAY);
+
+	// glEnableVertexAttribArray(0);
+	// glBindBuffer(GL_ARRAY_BUFFER, vbo);
+	// glVertexAttribPointer(
+	//    0,                  	// attribute 0. No particular reason for 0, but must match the layout in the shader.
+	//    3,                  	// size
+	//    GL_FLOAT,           	// type
+	//    GL_FALSE,           	// normalized?
+	//    0,                  	// stride
+	//    0            		// array buffer offset
+	// );
+	// glDrawArrays(GL_TRIANGLES, 0, 3);
+	// glDisableVertexAttribArray(0);
+
+	// glBegin( GL_TRIANGLES );
+ //      glVertex3f(  0.0f,  1.0f, 0.0f );
+ //      glVertex3f( -1.0f, -1.0f, 0.0f );
+ //      glVertex3f(  1.0f, -1.0f, 0.0f );
+ //    glEnd( );  
+
+	// glFlush();
+}
+
+int main (int argc, char *argv[])
+{
+	init();
+	createContext();
+
+	bool running = true;
+
+	while(running)
+	{
+		SDL_Event event;
+
+		while ( SDL_PollEvent(&event) )
+		{
+			switch(event.type)
+			{
+				case SDL_QUIT:
+					running = false;
+				break;
+
+				case SDL_KEYDOWN:
+					switch(event.key.keysym.sym)
+					{
+						case SDLK_ESCAPE:
+							running = false;
+						break;
+					}
+				break;
+			}
+		}
+		
+		render();
+		SDL_GL_SwapWindow(window);
+	}
+
+	SDL_Quit();
 	return 0;
 }

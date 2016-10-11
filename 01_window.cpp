@@ -1,3 +1,5 @@
+// this if for GLUT
+
 #include <OpenGL/gl.h>
 #include <OpenGL/glu.h>
 #include <GLUT/glut.h>

@@ -1,3 +1,5 @@
+// This is for GLUT
+
 #include <GL/glew.h>
 #include <OpenGL/gl.h>
 #include <OpenGL/glu.h>

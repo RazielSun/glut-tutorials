@@ -1,5 +1,7 @@
-#include <SDL2/SDL.h>
 
+#include <GL/glew.h>
+#include <stdio.h>
+#include <SDL2/SDL.h>
 #include <OpenGL/gl.h>
 #include <OpenGL/glu.h>
 
@@ -9,13 +11,21 @@
 #define glDeleteVertexArrays glDeleteVertexArraysAPPLE
 #endif
 
-#include <iostream>
 using namespace std;
 
 SDL_Window *window;
 
 const int width = 640;
 const int height = 480;
+
+GLuint vao;
+GLuint vbo;
+
+static const GLfloat vertices[] = {
+	   -1.0f, -1.0f, 0.0f,
+	   1.0f, -1.0f, 0.0f,
+	   0.0f,  1.0f, 0.0f,
+	};
 
 void init()
 {
@@ -30,49 +40,45 @@ void init()
 	SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, 6);
 	SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, 5);
 
-	window = SDL_CreateWindow("Cube", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL);
+	window = SDL_CreateWindow("Tutorial 04", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL);
 
-	SDL_GLContext glcontext = SDL_GL_CreateContext(window); // создаем контекст OpenGL
+	SDL_GLContext glcontext = SDL_GL_CreateContext(window);
 
 	if (window == NULL)
 	{
 		exit(1);
 	}
 
-	// glClearDepth(1.0);
-	// glDepthFunc(GL_LESS);
-	// glEnable(GL_DEPTH_TEST);
-	// glShadeModel(GL_SMOOTH);
-	// glMatrixMode(GL_PROJECTION);
-	// glLoadIdentity();
-	// gluPerspective(45.0f, (float) width / (float) height, 0.1f, 100.0f);
-	// glMatrixMode(GL_MODELVIEW);
+	glewExperimental = GL_TRUE;
+	GLenum res = glewInit();
+	if (res != GLEW_OK)
+	{
+	    fprintf(stderr, "Error: '%s'\n", glewGetErrorString(res));
+	    exit(1);
+	}
 }
-
-GLuint vao;
-GLuint vbo;
-
-static const GLfloat vertices[] = {
-	   -1.0f, -1.0f, 0.0f,
-	   1.0f, -1.0f, 0.0f,
-	   0.0f,  1.0f, 0.0f,
-	};
 
 void createContext ()
 {
+	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+
 	glGenVertexArrays(1, &vao);
 	glBindVertexArray(vao);
 
 	glGenBuffers(1, &vbo);
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
 void render ()
 {
-	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 	glClear(GL_COLOR_BUFFER_BIT);
+
+	glEnableClientState(GL_VERTEX_ARRAY);
+	glBindBuffer(GL_ARRAY_BUFFER, vbo);
+	glVertexPointer(3, GL_FLOAT, 0, 0);
+	glDrawArrays(GL_TRIANGLES, 0, 3);
+	glDisableClientState(GL_VERTEX_ARRAY);
 
 	// glEnableVertexAttribArray(0);
 	// glBindBuffer(GL_ARRAY_BUFFER, vbo);
@@ -86,14 +92,6 @@ void render ()
 	// );
 	// glDrawArrays(GL_TRIANGLES, 0, 3);
 	// glDisableVertexAttribArray(0);
-
-	glBegin( GL_TRIANGLES );            /* Drawing Using Triangles */
-      glVertex3f(  0.0f,  1.0f, 0.0f ); /* Top */
-      glVertex3f( -1.0f, -1.0f, 0.0f ); /* Bottom Left */
-      glVertex3f(  1.0f, -1.0f, 0.0f ); /* Bottom Right */
-    glEnd( );  
-
-	// glFlush();
 }
 
 int main (int argc, char *argv[])
