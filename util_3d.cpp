@@ -65,12 +65,51 @@ void Pipeline::InitTranslationTransform(Matrix4f& matrix)
 	matrix.m[3][0] = 0.0f; matrix.m[3][1] = 0.0f; matrix.m[3][2] = 0.0f; matrix.m[3][3] = 1.0f;
 }
 
+void Pipeline::InitPerspectiveProj(Matrix4f& matrix)
+{
+    const float ar = (float)m_width / (float)m_height;
+    const float zNear = m_near;
+    const float zFar = m_far;
+    const float zRange = zNear - zFar;
+    const float tanHalfFOV = tanf(ToRadian(m_FOV / 2.0));
+
+    matrix.m[0][0] = 1.0f / (tanHalfFOV * ar); 
+    matrix.m[0][1] = 0.0f;
+    matrix.m[0][2] = 0.0f;
+    matrix.m[0][3] = 0.0f;
+
+    matrix.m[1][0] = 0.0f;
+    matrix.m[1][1] = 1.0f / tanHalfFOV; 
+    matrix.m[1][2] = 0.0f; 
+    matrix.m[1][3] = 0.0f;
+
+    matrix.m[2][0] = 0.0f; 
+    matrix.m[2][1] = 0.0f; 
+    matrix.m[2][2] = (-zNear - zFar) / zRange; 
+    matrix.m[2][3] = 2.0f * zFar * zNear / zRange;
+
+    matrix.m[3][0] = 0.0f;
+    matrix.m[3][1] = 0.0f; 
+    matrix.m[3][2] = 1.0f; 
+    matrix.m[3][3] = 0.0f;
+}
+
+void Pipeline::SetPerspectiveProj(float fov, int width, int height, float near, float far)
+{
+    m_FOV = fov;
+    m_width = width;
+    m_height = height;
+    m_near = near;
+    m_far = far;
+}
+
 const Matrix4f* Pipeline::GetTrans()
 {
-	Matrix4f ScaleTrans, RotateTrans, TranslationTrans;
+	Matrix4f ScaleTrans, RotateTrans, TranslationTrans, PerspProjTrans;
     InitScaleTransform(ScaleTrans);
     InitRotateTransform(RotateTrans);
     InitTranslationTransform(TranslationTrans);
-    m_transformation = TranslationTrans * RotateTrans * ScaleTrans;
+    InitPerspectiveProj(PerspProjTrans);
+    m_transformation = PerspProjTrans * TranslationTrans * RotateTrans * ScaleTrans;
     return &m_transformation;
 }

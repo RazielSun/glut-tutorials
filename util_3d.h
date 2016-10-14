@@ -48,22 +48,37 @@ class Pipeline {
 public:
 	Pipeline()
 	{
+		m_near = 1.0f;
+		m_far = 1000.0f;
+		m_width = 640;
+		m_height = 480;
+		m_FOV = 60.0f;
+		m_scale = Vector3f(1.0f, 1.0f, 1.0f);
+		m_rotate = Vector3f(0.0f, 0.0f, 0.0f);
+		m_pos = Vector3f(0.0f, 0.0f, 0.0f);
 	}
 
 	void Scale(float scaleX, float scaleY, float scaleZ);
 	void Pos(float x, float y, float z);
 	void Rotate(float rotateX, float rotateY, float rotateZ);
+	void SetPerspectiveProj(float fov, int width, int height, float near, float far);
 	const Matrix4f* GetTrans();
 
 private:
 	void InitScaleTransform(Matrix4f& matrix);
     void InitRotateTransform(Matrix4f& matrix);
     void InitTranslationTransform(Matrix4f& matrix);
+    void InitPerspectiveProj(Matrix4f& matrix);
 
+    float m_near;
+    float m_far;
+    int m_width;
+    int m_height;
+    float m_FOV;
 	Vector3f m_scale;
 	Vector3f m_pos;
 	Vector3f m_rotate;
-	Matrix4f m_transformation;	
+	Matrix4f m_transformation;
 };
 
 #endif /* UTIL_3D */
