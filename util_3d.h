@@ -7,6 +7,23 @@
 #define ToRadian(x) ((x) * M_PI / 180.0f)
 #define ToDegree(x) ((x) * 180.0f / M_PI)
 
+struct ProjInfo {
+	float near;
+    float far;
+    int width;
+    int height;
+    float FOV;
+
+    ProjInfo()
+    {
+    	near = 1.0f;
+		far = 1000.0f;
+		width = 640;
+		height = 480;
+		FOV = 60.0f;
+    }
+};
+
 struct Vector3f {
 	float x, y, z;
 
@@ -19,6 +36,9 @@ struct Vector3f {
 		y = _y;
 		z = _z;
 	}
+
+	Vector3f Cross(const Vector3f& v);
+	Vector3f& Normalize();
 };
 
 class Matrix4f {
@@ -29,7 +49,7 @@ public:
 	{
 	}
 
-	inline Matrix4f operator* (const Matrix4f& right)
+	Matrix4f operator* (const Matrix4f& right)
 	{
 		Matrix4f ret;
 		for (unsigned int i = 0 ; i < 4 ; i++) {
@@ -42,17 +62,18 @@ public:
 	    }
 		return ret;
 	}
+
+	void InitScaleTransform(float scaleX, float scaleY, float scaleZ);
+    void InitRotateTransform(float rotateX, float rotateY, float rotateZ);
+    void InitTranslationTransform(float x, float y, float z);
+    void InitPerspectiveProj(float fov, int width, int height, float near, float far);
+    void InitCameraTransform(const Vector3f& target, const Vector3f& up);
 };
 
 class Pipeline {
 public:
 	Pipeline()
 	{
-		m_near = 1.0f;
-		m_far = 1000.0f;
-		m_width = 640;
-		m_height = 480;
-		m_FOV = 60.0f;
 		m_scale = Vector3f(1.0f, 1.0f, 1.0f);
 		m_rotate = Vector3f(0.0f, 0.0f, 0.0f);
 		m_pos = Vector3f(0.0f, 0.0f, 0.0f);
@@ -62,23 +83,21 @@ public:
 	void Pos(float x, float y, float z);
 	void Rotate(float rotateX, float rotateY, float rotateZ);
 	void SetPerspectiveProj(float fov, int width, int height, float near, float far);
+	void SetCamera(const Vector3f& pos, const Vector3f& target, const Vector3f& up);
 	const Matrix4f* GetTrans();
 
 private:
-	void InitScaleTransform(Matrix4f& matrix);
-    void InitRotateTransform(Matrix4f& matrix);
-    void InitTranslationTransform(Matrix4f& matrix);
-    void InitPerspectiveProj(Matrix4f& matrix);
-
-    float m_near;
-    float m_far;
-    int m_width;
-    int m_height;
-    float m_FOV;
 	Vector3f m_scale;
 	Vector3f m_pos;
 	Vector3f m_rotate;
+	ProjInfo m_projInfo;
 	Matrix4f m_transformation;
+
+	struct {
+		Vector3f pos;
+		Vector3f target;
+		Vector3f up;
+	} m_camera;
 };
 
 #endif /* UTIL_3D */
