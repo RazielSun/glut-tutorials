@@ -24,12 +24,28 @@ struct ProjInfo {
     }
 };
 
+struct Vector2i {
+	int x, y;
+};
+
 struct Vector3f {
 	float x, y, z;
 
 	Vector3f()
 	{
 	}
+
+	Vector3f(float f)
+    {
+        x = y = z = f;
+    }
+
+    Vector3f(const float* pFloat)
+    {
+        x = pFloat[0];
+        y = pFloat[0];
+        z = pFloat[0];
+    }
 
 	Vector3f(float _x, float _y, float _z) {
 		x = _x;
@@ -39,6 +55,7 @@ struct Vector3f {
 
 	Vector3f Cross(const Vector3f& v);
 	Vector3f& Normalize();
+	void Rotate(float Angle, const Vector3f& Axis);
 
 	Vector3f& operator+=(const Vector3f& r)
     {
@@ -77,6 +94,43 @@ struct Vector3f {
     }
 };
 
+struct Quaternion
+{
+    float x, y, z, w;
+
+    Quaternion(float _x, float _y, float _z, float _w);
+
+    void Normalize();
+
+    Quaternion Conjugate();  
+    
+    Vector3f ToDegrees();
+
+	Quaternion operator*(const Quaternion& r)
+	{
+	    const float _w = (w * r.w) - (x * r.x) - (y * r.y) - (z * r.z);
+	    const float _x = (x * r.w) + (w * r.x) + (y * r.z) - (z * r.y);
+	    const float _y = (y * r.w) + (w * r.y) + (z * r.x) - (x * r.z);
+	    const float _z = (z * r.w) + (w * r.z) + (x * r.y) - (y * r.x);
+
+	    Quaternion ret(_x, _y, _z, _w);
+
+	    return ret;
+	}
+
+	Quaternion operator*(const Vector3f& v)
+	{
+	    const float _w = - (x * v.x) - (y * v.y) - (z * v.z);
+	    const float _x =   (w * v.x) + (y * v.z) - (z * v.y);
+	    const float _y =   (w * v.y) + (z * v.x) - (x * v.z);
+	    const float _z =   (w * v.z) + (x * v.y) - (y * v.x);
+
+	    Quaternion ret(_x, _y, _z, _w);
+
+	    return ret;
+	}
+ };
+
 class Matrix4f {
 public:
 	float m[4][4];
@@ -109,13 +163,36 @@ public:
 
 class Camera {
 public:
-	Camera();
-	Camera(Vector3f& pos, Vector3f& target, Vector3f& up);
+	Camera()
+	{
+	}
+	
+	Camera(int width, int height);
+	Camera(int width, int height, Vector3f& pos, Vector3f& target, Vector3f& up);
+	void OnMouse(int x, int y);
 	bool OnKeyboard(int key);
+	void OnRender();
+
 	const Vector3f& GetPos();
 	const Vector3f& GetTarget();
 	const Vector3f& GetUp();
 private:
+	void Init();
+	void Update();
+
+	int m_windowWidth;
+	int m_windowHeight;
+
+	float m_AngleH;
+	float m_AngleV;
+
+	bool m_OnUpperEdge;
+    bool m_OnLowerEdge;
+    bool m_OnLeftEdge;
+    bool m_OnRightEdge;
+
+	Vector2i m_mousePos;
+
 	Vector3f m_pos;
 	Vector3f m_target;
 	Vector3f m_up;
@@ -143,6 +220,7 @@ private:
 	Vector3f m_rotate;
 	ProjInfo m_projInfo;
 	Matrix4f m_transformation;
+
 	Camera m_camera;
 };
 

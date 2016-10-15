@@ -4,6 +4,7 @@
 #include "util_3d.h"
 
 const static float STEP_SIZE = 1.0f;
+const static int MARGIN = 10;
 
 Vector3f Vector3f::Cross(const Vector3f& v)
 {
@@ -23,6 +24,64 @@ Vector3f& Vector3f::Normalize()
     z /= Length;
 
     return *this;
+}
+
+void Vector3f::Rotate(float Angle, const Vector3f& Axis)
+{
+	const float SinHalfAngle = sinf(ToRadian(Angle/2));
+    const float CosHalfAngle = cosf(ToRadian(Angle/2));
+
+    const float Rx = Axis.x * SinHalfAngle;
+    const float Ry = Axis.y * SinHalfAngle;
+    const float Rz = Axis.z * SinHalfAngle;
+    const float Rw = CosHalfAngle;
+    Quaternion RotationQ(Rx, Ry, Rz, Rw);
+
+    Quaternion ConjugateQ = RotationQ.Conjugate();
+    Quaternion W = RotationQ * (*this) * ConjugateQ;
+
+    x = W.x;
+    y = W.y;
+    z = W.z;
+}
+
+Quaternion::Quaternion(float _x, float _y, float _z, float _w)
+{
+    x = _x;
+    y = _y;
+    z = _z;
+    w = _w;
+}
+
+void Quaternion::Normalize()
+{
+    float Length = sqrtf(x * x + y * y + z * z + w * w);
+
+    x /= Length;
+    y /= Length;
+    z /= Length;
+    w /= Length;
+}
+
+Quaternion Quaternion::Conjugate()
+{
+    Quaternion ret(-x, -y, -z, w);
+    return ret;
+}
+
+Vector3f Quaternion::ToDegrees()
+{
+    float f[3];
+    
+    f[0] = atan2(x * z + y * w, x * w - y * z);
+    f[1] = acos(-x * x - y * y - z * z - w * w);
+    f[2] = atan2(x * z - y * w, x * w + y * z);
+       
+    f[0] = ToDegree(f[0]);
+    f[1] = ToDegree(f[1]);
+    f[2] = ToDegree(f[2]);
+
+    return Vector3f(f);
 }
 
 void Matrix4f::InitScaleTransform(float scaleX, float scaleY, float scaleZ)
@@ -116,18 +175,161 @@ void Matrix4f::InitCameraTransform(const Vector3f& target, const Vector3f& up)
     m[3][0] = 0.0f; m[3][1] = 0.0f; m[3][2] = 0.0f; m[3][3] = 1.0f;
 }
 
-Camera::Camera()
+Camera::Camera(int width, int height)
 {
+	m_windowWidth = width;
+	m_windowHeight = height;
 	m_pos = Vector3f(0.0f, 0.0f, 0.0f);
+
 	m_target = Vector3f(0.0f, 0.0f, 1.0f);
 	m_up = Vector3f(0.0f, 1.0f, 0.0f);
+
+	Init();
 }
 
-Camera::Camera(Vector3f& pos, Vector3f& target, Vector3f& up)
+Camera::Camera(int width, int height, Vector3f& pos, Vector3f& target, Vector3f& up)
 {
+	m_windowWidth = width;
+	m_windowHeight = height;
 	m_pos = pos;
+
 	m_target = target;
+	m_target.Normalize();
 	m_up = up;
+	m_up.Normalize();
+
+	Init();
+}
+
+void Camera::Init()
+{
+	Vector3f HTarget(m_target.x, 0.0, m_target.z);
+    HTarget.Normalize();
+
+    if (HTarget.z >= 0.0f)
+    {
+        if (HTarget.x >= 0.0f)
+        {
+            m_AngleH = 360.0f - ToDegree(asin(HTarget.z));
+        }
+        else
+        {
+            m_AngleH = 180.0f + ToDegree(asin(HTarget.z));
+        }
+    }
+    else
+    {
+        if (HTarget.x >= 0.0f)
+        {
+            m_AngleH = ToDegree(asin(-HTarget.z));
+        }
+        else
+        {
+            m_AngleH = 90.0f + ToDegree(asin(-HTarget.z));
+        }
+    }
+
+    m_AngleV = -ToDegree(asin(m_target.y));
+
+    m_OnUpperEdge = false;
+    m_OnLowerEdge = false;
+    m_OnLeftEdge = false;
+    m_OnRightEdge = false;
+    m_mousePos.x = m_windowWidth / 2;
+    m_mousePos.y = m_windowHeight / 2;
+}
+
+void Camera::OnMouse(int x, int y)
+{
+	const int DeltaX = x - m_mousePos.x;
+    const int DeltaY = y - m_mousePos.y;
+
+    m_mousePos.x = x;
+    m_mousePos.y = y;
+
+    m_AngleH += (float)DeltaX / 20.0f;
+    m_AngleV += (float)DeltaY / 20.0f;
+
+    if (DeltaX == 0) {
+        if (x <= MARGIN) {
+            m_OnLeftEdge = true;
+        }
+        else if (x >= (m_windowWidth - MARGIN)) {
+            m_OnRightEdge = true;
+        }
+    }
+    else {
+        m_OnLeftEdge = false;
+        m_OnRightEdge = false;
+    }
+
+    if (DeltaY == 0) {
+        if (y <= MARGIN) {
+            m_OnUpperEdge = true;
+        }
+        else if (y >= (m_windowHeight - MARGIN)) {
+            m_OnLowerEdge = true;
+        }
+    }
+    else {
+        m_OnUpperEdge = false;
+        m_OnLowerEdge = false;
+    }
+
+    Update();
+}
+
+void Camera::Update()
+{
+	Vector3f vaxis(0.0f, 1.0f, 0.0f);
+
+    // Rotate the view vector by the horizontal angle around the vertical axis
+    Vector3f view(1.0f, 0.0f, 0.0f);
+    view.Rotate(m_AngleH, vaxis);
+    view.Normalize();
+
+    // Rotate the view vector by the vertical angle around the horizontal axis
+    Vector3f haxis = vaxis.Cross(view);
+    haxis.Normalize();
+    view.Rotate(m_AngleV, haxis);
+    view.Normalize();
+
+    m_target = view;
+    m_target.Normalize();
+
+    m_up = m_target.Cross(haxis);
+    m_up.Normalize();
+}
+
+void Camera::OnRender()
+{
+    bool ShouldUpdate = false;
+
+    if (m_OnLeftEdge) {
+        m_AngleH -= 0.1f;
+        ShouldUpdate = true;
+    }
+    else if (m_OnRightEdge) {
+        m_AngleH += 0.1f;
+        ShouldUpdate = true;
+    }
+
+    if (m_OnUpperEdge) {
+        if (m_AngleV > -90.0f) {
+            m_AngleV -= 0.1f;
+            ShouldUpdate = true;
+        }
+    }
+    else if (m_OnLowerEdge) {
+        if (m_AngleV < 90.0f) {
+            m_AngleV += 0.1f;
+            ShouldUpdate = true;
+        }
+    }
+
+    if (ShouldUpdate) {
+        Update();
+    }
 }
 
 bool Camera::OnKeyboard(int key)
