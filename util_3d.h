@@ -39,6 +39,42 @@ struct Vector3f {
 
 	Vector3f Cross(const Vector3f& v);
 	Vector3f& Normalize();
+
+	Vector3f& operator+=(const Vector3f& r)
+    {
+        x += r.x;
+        y += r.y;
+        z += r.z;
+
+        return *this;
+    }
+
+    Vector3f& operator-=(const Vector3f& r)
+    {
+        x -= r.x;
+        y -= r.y;
+        z -= r.z;
+
+        return *this;
+    }
+
+    Vector3f& operator*=(float f)
+    {
+        x *= f;
+        y *= f;
+        z *= f;
+
+        return *this;
+    }
+
+    Vector3f operator*(float f)
+    {
+    	Vector3f v;
+    	v.x = x * f;
+    	v.y = y * f;
+    	v.z = z * f;
+    	return v;
+    }
 };
 
 class Matrix4f {
@@ -65,9 +101,24 @@ public:
 
 	void InitScaleTransform(float scaleX, float scaleY, float scaleZ);
     void InitRotateTransform(float rotateX, float rotateY, float rotateZ);
+    void InitTranslationTransform(const Vector3f& pos);
     void InitTranslationTransform(float x, float y, float z);
     void InitPerspectiveProj(float fov, int width, int height, float near, float far);
     void InitCameraTransform(const Vector3f& target, const Vector3f& up);
+};
+
+class Camera {
+public:
+	Camera();
+	Camera(Vector3f& pos, Vector3f& target, Vector3f& up);
+	bool OnKeyboard(int key);
+	const Vector3f& GetPos();
+	const Vector3f& GetTarget();
+	const Vector3f& GetUp();
+private:
+	Vector3f m_pos;
+	Vector3f m_target;
+	Vector3f m_up;
 };
 
 class Pipeline {
@@ -83,7 +134,7 @@ public:
 	void Pos(float x, float y, float z);
 	void Rotate(float rotateX, float rotateY, float rotateZ);
 	void SetPerspectiveProj(float fov, int width, int height, float near, float far);
-	void SetCamera(const Vector3f& pos, const Vector3f& target, const Vector3f& up);
+	void SetCamera(const Camera& camera);
 	const Matrix4f* GetTrans();
 
 private:
@@ -92,12 +143,7 @@ private:
 	Vector3f m_rotate;
 	ProjInfo m_projInfo;
 	Matrix4f m_transformation;
-
-	struct {
-		Vector3f pos;
-		Vector3f target;
-		Vector3f up;
-	} m_camera;
+	Camera m_camera;
 };
 
 #endif /* UTIL_3D */
