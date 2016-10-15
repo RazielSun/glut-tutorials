@@ -26,14 +26,28 @@ struct ProjInfo {
 
 struct Vector2i {
 	int x, y;
+	Vector2i() {}
+	Vector2i(int _x, int _y)
+	{
+		x = _x;
+		y = _y;
+	}
+};
+
+struct Vector2f {
+	float x, y;
+	Vector2f() {}
+	Vector2f(float _x, float _y)
+	{
+		x = _x;
+		y = _y;
+	}
 };
 
 struct Vector3f {
 	float x, y, z;
 
-	Vector3f()
-	{
-	}
+	Vector3f() {}
 
 	Vector3f(float f)
     {
@@ -196,6 +210,19 @@ private:
 	Vector3f m_pos;
 	Vector3f m_target;
 	Vector3f m_up;
+};
+
+struct Vertex {
+	Vector3f pos;
+	Vector2f uv;
+
+	Vertex() {}
+
+	Vertex(Vector3f _pos, Vector2f _uv)
+	{
+		pos = _pos;
+		uv = _uv;
+	}
 };
 
 class Pipeline {

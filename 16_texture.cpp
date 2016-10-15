@@ -1,7 +1,8 @@
 
 #include <assert.h>
 #include <math.h>
-#include "util_3d.h"
+#include "utils/util_3d.h"
+#include "utils/util_texture.h"
 #include <iostream>
 
 #include <GL/glew.h>
@@ -9,49 +10,42 @@
 #include <OpenGL/gl.h>
 #include <OpenGL/glu.h>
 
+#define WINDOW_WIDTH 1024
+#define WINDOW_HEIGHT 768
+
+const char* WINDOW_NAME = "Tutorial 16";
+
 GLuint ibo;
 GLuint vbo;
-GLuint uWorldLocation;
+GLuint uWPM;
+GLuint uSampler;
 
 Camera *camera = NULL;
-
-const int WINDOW_WIDTH = 640;
-const int WINDOW_HEIGHT = 480;
-const char* WINDOW_NAME = "Tutorial 15";
-
-static const GLfloat vertices[] = {
-   -1.0f, -1.0f, 0.0f,
-   0.0f, -1.0f, 1.0f,
-   1.0f, -1.0f, 0.0f,
-   0.0f,  1.0f, 0.0f,
-};
-
-static const unsigned int indices[] = {
-	0, 3, 1,
-	1, 3, 2,
-	2, 3, 0,
-	0, 1, 2,
-};
+Texture *texture = NULL;
 
 static std::string vertex_shader = ""
 "attribute vec3 position;"
-"uniform mat4 world;"
-"varying vec4 color;"
+"attribute vec2 texCoord;"
+"uniform mat4 WPM;"
+"varying vec2 uvCoord;"
 "void main()"
 "{"
-"   gl_Position = world * vec4(position, 1.0);"
-"	color = vec4(clamp(position, 0.0, 1.0), 1.0);"
+"   gl_Position = WPM * vec4(position, 1.0);"
+"	uvCoord = texCoord;"
 "}";
 
 static std::string fragment_shader = ""
-"varying vec4 color;"
+"uniform sampler2D sampler;"
+"varying vec2 uvCoord;"
 "void main()"
 "{"
-"    gl_FragColor = color;"
+"    gl_FragColor = texture2D(sampler, uvCoord);"
 "}";
 
 void render ()
 {
+	camera->OnRender();
+
 	glClear(GL_COLOR_BUFFER_BIT);
 
 	static float scale = 0.0f;
@@ -61,22 +55,24 @@ void render ()
 
 	p.Rotate(0.0f, scale, 0.0f);
 	p.Pos(0.0f, 0.0f, 3.0f);
-	p.SetPerspectiveProj(30.0f, WINDOW_WIDTH, WINDOW_HEIGHT, 1.0f, 1000.0f);
+	p.SetPerspectiveProj(60.0f, WINDOW_WIDTH, WINDOW_HEIGHT, 1.0f, 100.0f);
 
 	p.SetCamera(*camera);
 
-	glUniformMatrix4fv(uWorldLocation, 1, GL_TRUE, (const GLfloat*)p.GetTrans());
+	glUniformMatrix4fv(uWPM, 1, GL_TRUE, (const GLfloat*)p.GetTrans());
 
 	glEnableVertexAttribArray(0);
+	glEnableVertexAttribArray(1);
 
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
-
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), 0);
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (const GLvoid*)12);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
-
+	texture->Bind(GL_TEXTURE0);
 	glDrawElements(GL_TRIANGLES, 12, GL_UNSIGNED_INT, 0);
 
 	glDisableVertexAttribArray(0);
+	glDisableVertexAttribArray(1);
 }
 
 SDL_Window *window;
@@ -119,9 +115,23 @@ void createContext ()
 	glGenVertexArrays(1, &vbo); // may use another name variable instead vbo
 	glBindVertexArray(vbo);
 
+	Vertex vertices[4] = {
+		Vertex(Vector3f(-1.0f, -1.0f, 0.5773f), Vector2f(0.0f, 0.0f)),
+		Vertex(Vector3f(0.0f, -1.0f, -1.15475f), Vector2f(0.5f, 0.0f)),
+		Vertex(Vector3f(1.0f, -1.0f, 0.5773f),  Vector2f(1.0f, 0.0f)),
+		Vertex(Vector3f(0.0f, 1.0f, 0.0f),      Vector2f(0.5f, 1.0f))
+	};
+
 	glGenBuffers(1, &vbo);
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+	unsigned int indices[] = {
+		0, 3, 1,
+		1, 3, 2,
+		2, 3, 0,
+		0, 1, 2,
+	};
 
 	glGenBuffers(1, &ibo);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
@@ -181,17 +191,32 @@ void createShaderProgram ()
 
     glUseProgram(program);
 
-    uWorldLocation = glGetUniformLocation(program, "world");
-	assert(uWorldLocation != 0xFFFFFFFF);
+    uWPM = glGetUniformLocation(program, "WPM");
+	assert(uWPM != 0xFFFFFFFF);
+
+	uSampler = glGetUniformLocation(program, "sampler");
+	assert(uSampler != 0xFFFFFFFF);
 }
 
 int main (int argc, char *argv[])
 {
 	init();
-	createContext();
-	createShaderProgram();
 
 	camera = new Camera(WINDOW_WIDTH, WINDOW_HEIGHT);
+
+	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+    glFrontFace(GL_CW);
+    glCullFace(GL_BACK);
+    glEnable(GL_CULL_FACE);
+
+	createContext();
+	createShaderProgram();
+    glUniform1i(uSampler, 0);
+
+	texture = new Texture(GL_TEXTURE_2D, "content/uvLayoutGrid.jpg");
+	if (!texture->Load()) {
+		return 1;
+	}
 
 	bool running = true;
 
@@ -238,7 +263,6 @@ int main (int argc, char *argv[])
 			}
 		}
 		
-		camera->OnRender();
 		render();
 		SDL_GL_SwapWindow(window);
 	}
