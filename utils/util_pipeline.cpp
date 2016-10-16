@@ -36,15 +36,48 @@ void Pipeline::SetCamera(const Camera& camera)
 	m_camera = camera;
 }
 
-const Matrix4f* Pipeline::GetTrans()
+const Matrix4f* Pipeline::GetWorldTrans()
 {
-	Matrix4f ScaleTrans, RotateTrans, TranslationTrans, PerspProjTrans, CameraRotateTrans, CameraTranslationTrans;
+    Matrix4f ScaleTrans, RotateTrans, TranslationTrans;
+
     ScaleTrans.InitScaleTransform(m_scale.x, m_scale.y, m_scale.z);
     RotateTrans.InitRotateTransform(m_rotate.x, m_rotate.y, m_rotate.z);
     TranslationTrans.InitTranslationTransform(m_pos);
-    PerspProjTrans.InitPerspectiveProj(m_projInfo.FOV, m_projInfo.width, m_projInfo.height, m_projInfo.near, m_projInfo.far);
+
+    m_World = TranslationTrans * RotateTrans * ScaleTrans;
+
+    return &m_World;
+}
+
+const Matrix4f* Pipeline::GetViewTrans()
+{
+    Matrix4f CameraRotateTrans, CameraTranslationTrans;
+
     CameraTranslationTrans.InitTranslationTransform(m_camera.GetPos());
     CameraRotateTrans.InitCameraTransform(m_camera.GetTarget(), m_camera.GetUp());
-    m_transformation = PerspProjTrans * CameraRotateTrans * CameraTranslationTrans * TranslationTrans * RotateTrans * ScaleTrans;
-    return &m_transformation;
+
+    m_View = CameraRotateTrans * CameraTranslationTrans;
+
+    return &m_View;
+}
+
+const Matrix4f* Pipeline::GetProjTrans()
+{
+    Matrix4f PerspProjTrans;
+
+    PerspProjTrans.InitPerspectiveProj(m_projInfo.FOV, m_projInfo.width, m_projInfo.height, m_projInfo.near, m_projInfo.far);
+
+    m_Proj = PerspProjTrans;
+
+    return &m_Proj;
+}
+
+const Matrix4f* Pipeline::GetTrans()
+{
+	GetWorldTrans();
+    GetViewTrans();
+    GetProjTrans();
+
+    m_WVP = m_Proj * m_View * m_World;
+    return &m_WVP;
 }

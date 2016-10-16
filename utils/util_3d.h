@@ -95,6 +95,24 @@ struct Vector3f {
         return *this;
     }
 
+    Vector3f operator+(const Vector3f& r)
+	{
+	    Vector3f Ret(x + r.x,
+	                 y + r.y,
+	                 z + r.z);
+
+	    return Ret;
+	}
+
+	Vector3f operator-(const Vector3f& r)
+	{
+	    Vector3f Ret(x - r.x,
+	                 y - r.y,
+	                 z - r.z);
+
+	    return Ret;
+	}
+
     Vector3f& operator*=(float f)
     {
         x *= f;
@@ -182,6 +200,7 @@ public:
 struct Vertex {
 	Vector3f pos;
 	Vector2f uv;
+	Vector3f normal;
 
 	Vertex() {}
 
@@ -189,6 +208,7 @@ struct Vertex {
 	{
 		pos = _pos;
 		uv = _uv;
+		normal = Vector3f(0.0f, 0.0f, 0.0f);
 	}
 };
 

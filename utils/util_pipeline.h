@@ -19,6 +19,9 @@ public:
 	void Rotate(float rotateX, float rotateY, float rotateZ);
 	void SetPerspectiveProj(float fov, int width, int height, float near, float far);
 	void SetCamera(const Camera& camera);
+	const Matrix4f* GetWorldTrans();
+	const Matrix4f* GetViewTrans();
+	const Matrix4f* GetProjTrans();
 	const Matrix4f* GetTrans();
 
 private:
@@ -26,7 +29,10 @@ private:
 	Vector3f m_pos;
 	Vector3f m_rotate;
 	ProjInfo m_projInfo;
-	Matrix4f m_transformation;
+	Matrix4f m_World;
+	Matrix4f m_View;
+	Matrix4f m_Proj;
+	Matrix4f m_WVP;
 
 	Camera m_camera;
 };
