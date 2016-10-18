@@ -26,17 +26,7 @@ void LightProgram::Link()
     m_directionLight.DiffuseIntensity = GetUniformLocation("directionLight.Base.DiffuseIntensity");
     m_directionLight.Direction = GetUniformLocation("directionLight.Direction");
     
-    m_pointsCount = GetUniformLocation("gNumPointLights");
-}
-
-void LightProgram::SetDirectionLight(const DirectionLight& light)
-{
-	glUniform3f(m_directionLight.Color, light.Color.x, light.Color.y, light.Color.z);
-    glUniform1f(m_directionLight.AmbientIntensity, light.AmbientIntensity);
-    Vector3f Direction = light.Direction;
-    Direction.Normalize();
-    glUniform3f(m_directionLight.Direction, Direction.x, Direction.y, Direction.z);
-    glUniform1f(m_directionLight.DiffuseIntensity, light.DiffuseIntensity);
+    m_pointsCount = GetUniformLocation("numPointLights");
 
     for (unsigned int i = 0 ; i < ARRAY_SIZE_IN_ELEMENTS(m_points) ; i++) {
         char name[128];
@@ -63,6 +53,16 @@ void LightProgram::SetDirectionLight(const DirectionLight& light)
         sprintf(name, "pointLight[%d].Atten.Exp", i);
         m_points[i].Attenuation.Exp = GetUniformLocation(name);
     }
+}
+
+void LightProgram::SetDirectionLight(const DirectionLight& light)
+{
+	glUniform3f(m_directionLight.Color, light.Color.x, light.Color.y, light.Color.z);
+    glUniform1f(m_directionLight.AmbientIntensity, light.AmbientIntensity);
+    Vector3f Direction = light.Direction;
+    Direction.Normalize();
+    glUniform3f(m_directionLight.Direction, Direction.x, Direction.y, Direction.z);
+    glUniform1f(m_directionLight.DiffuseIntensity, light.DiffuseIntensity);
 }
 
 void LightProgram::SetPointLights(unsigned int numLights, const PointLight* pLights)

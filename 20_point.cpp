@@ -17,13 +17,14 @@
 #define WINDOW_HEIGHT 768
 #define PLANE_WIDTH 5.0f
 #define PLANE_HEIGHT 5.0f
+#define MAX_POINT_LIGHTS 2
 
 const char* WINDOW_NAME = "Tutorial 20";
 
 GLuint ibo;
 GLuint vbo;
 DirectionLight directionLight;
-PointLight pointLights[2];
+PointLight pointLights[MAX_POINT_LIGHTS];
 
 Camera *camera = NULL;
 Texture *texture = NULL;
@@ -118,12 +119,16 @@ void render ()
 	glClear(GL_COLOR_BUFFER_BIT);
 
 	static float scale = 0.0f;
-	scale += 0.1f;
+	scale += 0.01f;
 
 	Pipeline p;
 
-	// p.Rotate(0.0f, scale, 0.0f);
-	p.Pos(0.0f, 0.0f, 3.0f);
+	float Z = 3.0f;
+
+	pointLights[0].Position = Vector3f(2.0f*sinf(scale), 1.0f, Z+2.0f*cosf(scale));
+	pointLights[1].Position = Vector3f(-2.0f*sinf(scale), 1.0f, Z+2.0f*cosf(scale));
+
+	p.Pos(0.0f, 0.0f, Z);
 	p.SetPerspectiveProj(60.0f, WINDOW_WIDTH, WINDOW_HEIGHT, 1.0f, 100.0f);
 	p.SetCamera(*camera);
 	
@@ -220,6 +225,15 @@ void init()
 	}
 }
 
+void addPointIntensity(float delta)
+{
+	for (int i = 0; i < MAX_POINT_LIGHTS; i++)
+	{
+		pointLights[i].AmbientIntensity += delta;
+	    pointLights[i].DiffuseIntensity += delta;
+	}
+}
+
 int main (int argc, char *argv[])
 {
 	init();
@@ -237,19 +251,18 @@ int main (int argc, char *argv[])
     directionLight.AmbientIntensity = 0.1f; 
     directionLight.DiffuseIntensity = 0.1f;
     directionLight.Direction = Vector3f(1.0f, -1.0f, 0.0f);
-
-    pointLights[0].DiffuseIntensity = 20.0f;
+    
     pointLights[0].Color = Vector3f(1.0f, 0.5f, 0.0f);
-    pointLights[0].Position = Vector3f(1.0f, 0.5f, 1.0f);
-    pointLights[0].Attenuation.Constant = 0.01f;
+    pointLights[0].AmbientIntensity = 0.1f;
+    pointLights[0].DiffuseIntensity = 0.1f;
+    pointLights[0].Position = Vector3f(3.0f, 1.0f, 3.0f);
     pointLights[0].Attenuation.Linear = 0.1f;
-    pointLights[0].Attenuation.Exp = 0.001f;
-    pointLights[1].DiffuseIntensity = 20.0f;
+    
     pointLights[1].Color = Vector3f(0.0f, 0.5f, 1.0f);
-    pointLights[1].Position = Vector3f(-1.0f, 0.5f, 1.0f);
-    pointLights[1].Attenuation.Constant = 0.01f;
+    pointLights[1].AmbientIntensity = 0.1f;
+    pointLights[1].DiffuseIntensity = 0.1f;
+    pointLights[1].Position = Vector3f(-3.0f, 1.0f, 3.0f);
     pointLights[1].Attenuation.Linear = 0.1f;
-    pointLights[1].Attenuation.Exp = 0.001f;
 
 	createContext();
 	createShaderProgram();
@@ -281,6 +294,18 @@ int main (int argc, char *argv[])
 					camera->OnKeyboard(event.key.keysym.sym);
 					switch(event.key.keysym.sym)
 					{
+						case SDLK_q:
+							directionLight.AmbientIntensity += 0.1f;
+							break;
+						case SDLK_w:
+							directionLight.AmbientIntensity -= 0.1f;
+							break;
+						case SDLK_a:
+							addPointIntensity(0.1f);
+							break;
+						case SDLK_s:
+							addPointIntensity(-0.1f);
+							break;
 						case SDLK_ESCAPE:
 							running = false;
 							break;
