@@ -11,4 +11,6 @@ utils/util_3d.cpp \
 utils/util_texture.cpp \
 utils/util_pipeline.cpp \
 utils/util_camera.cpp \
+utils/util_shader_program.cpp \
+utils/util_light.cpp \
 `Magick++-config --ldflags --libs`

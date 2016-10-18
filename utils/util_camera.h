@@ -10,6 +10,8 @@ public:
 	
 	Camera(int width, int height);
 	Camera(int width, int height, Vector3f& pos, Vector3f& target, Vector3f& up);
+	void SetPos(float x, float y, float z);
+	void LookAt(float x, float y, float z);
 	void OnMouse(int x, int y);
 	bool OnKeyboard(int key);
 	void OnRender();

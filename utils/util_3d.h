@@ -4,6 +4,7 @@
 
 #include <math.h>
 
+#define ARRAY_SIZE_IN_ELEMENTS(a) (sizeof(a)/sizeof(a[0]))
 #define ToRadian(x) ((x) * M_PI / 180.0f)
 #define ToDegree(x) ((x) * 180.0f / M_PI)
 
@@ -209,6 +210,13 @@ struct Vertex {
 		pos = _pos;
 		uv = _uv;
 		normal = Vector3f(0.0f, 0.0f, 0.0f);
+	}
+
+	Vertex(Vector3f _pos, Vector2f _uv, Vector3f _normal)
+	{
+		pos = _pos;
+		uv = _uv;
+		normal = _normal;
 	}
 };
 

@@ -16,7 +16,7 @@
 #define WINDOW_WIDTH 1024
 #define WINDOW_HEIGHT 768
 
-const char* WINDOW_NAME = "Tutorial 16";
+const char* WINDOW_NAME = "Tutorial 18";
 
 GLuint ibo;
 GLuint vbo;

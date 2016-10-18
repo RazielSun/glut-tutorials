@@ -31,6 +31,26 @@ Camera::Camera(int width, int height, Vector3f& pos, Vector3f& target, Vector3f&
 	Init();
 }
 
+void Camera::SetPos(float x, float y, float z)
+{
+    Vector3f pos(x, y, z);
+    m_pos = pos;
+}
+
+void Camera::LookAt(float x, float y, float z)
+{
+    Vector3f lookAt(x, y, z);
+    Vector3f target = lookAt - m_pos;
+    target.Normalize();
+    Vector3f left(m_pos.x + 1.0f, m_pos.y, m_pos.z);
+    left.Normalize();
+    Vector3f up = target.Cross(left);
+    up.Normalize();
+
+    m_target = target;
+    m_up = up;
+}
+
 void Camera::Init()
 {
 	Vector3f HTarget(m_target.x, 0.0, m_target.z);
