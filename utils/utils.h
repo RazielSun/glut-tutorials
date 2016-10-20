@@ -5,9 +5,13 @@
 #include <math.h>
 
 #define ARRAY_SIZE_IN_ELEMENTS(a) (sizeof(a)/sizeof(a[0]))
+
 #define SAFE_DELETE(p) if (p) { delete p; p = NULL; }
+
 #define ToRadian(x) ((x) * M_PI / 180.0f)
 #define ToDegree(x) ((x) * 180.0f / M_PI)
+
+#define INVALID_OGL_VALUE 0xffffffff
 
 struct ProjInfo {
 	float near;

@@ -35,11 +35,32 @@ class Mesh {
 public:
 	Mesh();
 	~Mesh();
+
 	bool LoadMesh(const std::string& fileName);
 	void Render();
+
 private:
+	bool InitFromScene(const aiScene* scene, const std::string& fileName);
+	void InitMesh(unsigned int Index, const aiMesh* paiMesh);
+	bool InitMaterials(const aiScene* scene, const std::string& fileName);
 	void Clear();
 
+#define INVALID_MATERIAL 0xFFFFFFFF
+
+	struct MeshEntry {
+		MeshEntry();
+		~MeshEntry();
+
+		void Init(const std::vector<Vertex>& verticies, const std::vector<unsigned int>& indices);
+
+		GLuint VB;
+		GLuint IB;
+
+		unsigned int numIndices;
+		unsigned int materialIndex;
+	};
+
+	std::vector<MeshEntry> m_Entries;
 	std::vector<Texture*> m_Textures; 
 };
 
