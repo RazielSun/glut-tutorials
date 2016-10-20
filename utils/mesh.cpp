@@ -22,7 +22,7 @@ bool Mesh::LoadMesh(const std::string& fileName)
     
     if (pScene)
     {
-        success = Assimp::InitFromScene(pScene, fileName);
+        success = InitFromScene(pScene, fileName);
     }
     else
     {
