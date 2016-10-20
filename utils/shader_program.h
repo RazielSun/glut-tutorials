@@ -1,8 +1,8 @@
 
-#ifndef UTIL_SHADER_PROGRAM
-#define UTIL_SHADER_PROGRAM
+#ifndef SHADER_PROGRAM_H
+#define SHADER_PROGRAM_H
 
-#include "util_3d.h"
+#include "utils.h"
 #include <GL/glew.h>
 
 class ShaderProgram {
@@ -26,4 +26,4 @@ protected:
 };
 
 
-#endif /* UTIL_SHADER_PROGRAM */
+#endif /* SHADER_PROGRAM_H */

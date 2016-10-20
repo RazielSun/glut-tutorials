@@ -1,6 +1,6 @@
 
 #include <SDL2/SDL.h>
-#include "util_camera.h"
+#include "camera.h"
 
 const static float STEP_SIZE = 1.0f;
 const static int MARGIN = 10;

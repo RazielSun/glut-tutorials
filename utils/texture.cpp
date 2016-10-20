@@ -1,7 +1,7 @@
 
 #include <math.h>
 #include <iostream>
-#include "util_texture.h"
+#include "texture.h"
 
 Texture::Texture(GLenum textureTarget, const std::string& fileName)
 {

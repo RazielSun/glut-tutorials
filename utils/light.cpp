@@ -2,7 +2,7 @@
 #include <cstdio>
 #include <math.h>
 #include <iostream>
-#include "util_light.h"
+#include "light.h"
 
 LightProgram::LightProgram()
 {

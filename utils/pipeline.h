@@ -1,9 +1,9 @@
 
-#ifndef UTIL_PIPELINE
-#define UTIL_PIPELINE
+#ifndef PIPELINE_H
+#define PIPELINE_H
 
-#include "util_3d.h"
-#include "util_camera.h"
+#include "utils.h"
+#include "camera.h"
 
 class Pipeline {
 public:
@@ -37,4 +37,4 @@ private:
 	Camera m_camera;
 };
 
-#endif /* UTIL_PIPELINE */
+#endif /* PIPELINE_H */

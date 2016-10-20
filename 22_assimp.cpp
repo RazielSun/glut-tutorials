@@ -1,11 +1,11 @@
 
 #include <assert.h>
 #include <math.h>
-#include "utils/util_3d.h"
-#include "utils/util_camera.h"
-#include "utils/util_pipeline.h"
-#include "utils/util_texture.h"
-#include "utils/util_light.h"
+#include "utils/utils.h"
+#include "utils/camera.h"
+#include "utils/pipeline.h"
+#include "utils/light.h"
+#include "utils/mesh.h"
 #include <iostream>
 
 #include <GL/glew.h>
@@ -19,15 +19,11 @@
 #define PLANE_HEIGHT 5.0f
 #define MAX_LIGHTS 2
 
-const char* WINDOW_NAME = "Tutorial 21";
+const char* WINDOW_NAME = "Tutorial 22";
 
-GLuint ibo;
-GLuint vbo;
 DirectionLight directionLight;
-SpotLight spotLights[MAX_LIGHTS];
 
 Camera *camera = NULL;
-Texture *texture = NULL;
 LightProgram *program = NULL;
 
 static std::string vertex_shader = ""
@@ -144,13 +140,7 @@ void render ()
 	scale += 0.01f;
 
 	Pipeline p;
-
-	float Z = 3.0f;
-	spotLights[0].Position = camera->GetPos();
-    spotLights[0].Direction = camera->GetTarget();
-	spotLights[1].Position = Vector3f(-2.0f*sinf(scale), 3.0f, Z+2.0f*cosf(scale));
-
-	p.Pos(0.0f, 0.0f, Z);
+	p.Pos(0.0f, 0.0f, 3.0f);
 	p.SetPerspectiveProj(60.0f, WINDOW_WIDTH, WINDOW_HEIGHT, 1.0f, 100.0f);
 	p.SetCamera(*camera);
 	
@@ -158,48 +148,22 @@ void render ()
 	program->SetWorld(p.GetWorldTrans());
 	program->SetDirectionLight(directionLight);
 	program->SetPointLights(0, NULL);
-	program->SetSpotLights(2, spotLights);
-	
-	glBindBuffer(GL_ARRAY_BUFFER, vbo);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), 0);
-	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (const GLvoid*)12);
-	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (const GLvoid*)20);
-	glEnableVertexAttribArray(2);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
+	program->SetSpotLights(0, NULL);
 
-	texture->Bind(GL_TEXTURE0);
-	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+	// glEnableVertexAttribArray(0);
+	// glEnableVertexAttribArray(1);
+	// glEnableVertexAttribArray(2);
 
-	glDisableVertexAttribArray(0);
-	glDisableVertexAttribArray(1);
-	glDisableVertexAttribArray(2);
-}
+	// glBindBuffer(GL_ARRAY_BUFFER, vbo);
+	// glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), 0);
+	// glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (const GLvoid*)12);
+	// glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (const GLvoid*)20);
+	// glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
+	// glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
-void createContext ()
-{
-	unsigned int indices[] = { 0, 1, 2,
-                               0, 2, 3 };
-
-	unsigned int indexCount = ARRAY_SIZE_IN_ELEMENTS(indices);
-
-	glGenBuffers(1, &ibo);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
-
-	Vector3f Normal(0.0f, 1.0f, 0.0f);
-
-	Vertex vertices[4] = { Vertex(Vector3f(-PLANE_WIDTH, 0.0f, -PLANE_HEIGHT), 	Vector2f(0.0f, 0.0f), Normal),
-                           Vertex(Vector3f(-PLANE_WIDTH, 0.0f, PLANE_HEIGHT), 	Vector2f(0.0f, 1.0f), Normal),
-                           Vertex(Vector3f(PLANE_WIDTH, 0.0f, PLANE_HEIGHT),  	Vector2f(1.0f, 1.0f), Normal),
-                           Vertex(Vector3f(PLANE_WIDTH, 0.0f, -PLANE_HEIGHT),	Vector2f(1.0f, 0.0f), Normal) };
-
-	unsigned int vertexCount = ARRAY_SIZE_IN_ELEMENTS(vertices);
-
-	glGenBuffers(1, &vbo);
-	glBindBuffer(GL_ARRAY_BUFFER, vbo);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+	// glDisableVertexAttribArray(0);
+	// glDisableVertexAttribArray(1);
+	// glDisableVertexAttribArray(2);
 }
 
 void createShaderProgram ()
@@ -248,15 +212,6 @@ void init()
 	}
 }
 
-void addPointIntensity(float delta)
-{
-	for (int i = 0; i < MAX_LIGHTS; i++)
-	{
-		spotLights[i].AmbientIntensity += delta;
-	    spotLights[i].DiffuseIntensity += delta;
-	}
-}
-
 int main (int argc, char *argv[])
 {
 	init();
@@ -274,28 +229,8 @@ int main (int argc, char *argv[])
     directionLight.AmbientIntensity = 0.1f; 
     directionLight.DiffuseIntensity = 0.1f;
     directionLight.Direction = Vector3f(1.0f, -1.0f, 0.0f);
-
-    spotLights[0].DiffuseIntensity = 0.9f;
-    spotLights[0].Color = Vector3f(0.0f, 1.0f, 1.0f);
-    // spotLights[0].Position = camera->GetPos();
-    // spotLights[0].Direction = camera->GetTarget();
-    spotLights[0].Attenuation.Linear = 0.1f;
-    spotLights[0].Cutoff = 10.0f;
-
-    spotLights[1].DiffuseIntensity = 0.9f;
-    spotLights[1].Color = Vector3f(1.0f, 1.0f, 1.0f);
-    // spotLights[1].Position = Vector3f(0.0f, 3.0f, 3.0f);
-    spotLights[1].Direction = Vector3f(0.0f, -1.0f, 0.0f);
-    spotLights[1].Attenuation.Linear = 0.1f;
-    spotLights[1].Cutoff = 20.0f;
     
-	createContext();
 	createShaderProgram();
-
-	texture = new Texture(GL_TEXTURE_2D, "content/uvLayoutGrid.jpg");
-	if (!texture->Load()) {
-		return 1;
-	}
 
 	bool running = true;
 
@@ -324,12 +259,6 @@ int main (int argc, char *argv[])
 							break;
 						case SDLK_w:
 							directionLight.AmbientIntensity -= 0.1f;
-							break;
-						case SDLK_a:
-							addPointIntensity(0.1f);
-							break;
-						case SDLK_s:
-							addPointIntensity(-0.1f);
 							break;
 						case SDLK_ESCAPE:
 							running = false;

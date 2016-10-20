@@ -6,11 +6,12 @@ name=$1
 inputName=$name".cpp"
 outputName=$name".out"
 
-g++ $inputName `Magick++-config --cxxflags --cppflags` -lGLEW -lSDL2 -framework OpenGL -o $outputName \
-utils/util_3d.cpp \
-utils/util_texture.cpp \
-utils/util_pipeline.cpp \
-utils/util_camera.cpp \
-utils/util_shader_program.cpp \
-utils/util_light.cpp \
+g++ $inputName `Magick++-config --cxxflags --cppflags` -lGLEW -lSDL2 -lassimp -framework OpenGL -o $outputName \
+utils/utils.cpp \
+utils/texture.cpp \
+utils/pipeline.cpp \
+utils/camera.cpp \
+utils/shader_program.cpp \
+utils/light.cpp \
+utils/mesh.cpp \
 `Magick++-config --ldflags --libs`

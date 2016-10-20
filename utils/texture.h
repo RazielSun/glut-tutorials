@@ -1,6 +1,6 @@
 
-#ifndef UTIL_TEXTURE
-#define UTIL_TEXTURE
+#ifndef TEXTURE_H
+#define TEXTURE_H
 
 #include <GL/glew.h>
 #include <ImageMagick-6/Magick++.h>
@@ -19,4 +19,4 @@ private:
     Magick::Blob m_blob;
 };
 
-#endif /* UTIL_TEXTURE */
+#endif /* TEXTURE_H */

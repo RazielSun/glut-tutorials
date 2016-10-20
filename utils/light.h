@@ -1,9 +1,9 @@
 
-#ifndef UTIL_LIGHT_PROGRAM
-#define UTIL_LIGHT_PROGRAM
+#ifndef LIGHT_PROGRAM_H
+#define LIGHT_PROGRAM_H
 
-#include "util_3d.h"
-#include "util_shader_program.h"
+#include "utils.h"
+#include "shader_program.h"
 #include <GL/glew.h>
 
 struct BaseLight {
@@ -82,4 +82,4 @@ private:
 };
 
 
-#endif /* UTIL_LIGHT_PROGRAM */
+#endif /* LIGHT_PROGRAM_H */

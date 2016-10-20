@@ -1,10 +1,11 @@
 
-#ifndef UTIL_3D
-#define UTIL_3D
+#ifndef UTILS_H
+#define UTILS_H
 
 #include <math.h>
 
 #define ARRAY_SIZE_IN_ELEMENTS(a) (sizeof(a)/sizeof(a[0]))
+#define SAFE_DELETE(p) if (p) { delete p; p = NULL; }
 #define ToRadian(x) ((x) * M_PI / 180.0f)
 #define ToDegree(x) ((x) * 180.0f / M_PI)
 
@@ -198,26 +199,4 @@ public:
     void InitCameraTransform(const Vector3f& target, const Vector3f& up);
 };
 
-struct Vertex {
-	Vector3f pos;
-	Vector2f uv;
-	Vector3f normal;
-
-	Vertex() {}
-
-	Vertex(Vector3f _pos, Vector2f _uv)
-	{
-		pos = _pos;
-		uv = _uv;
-		normal = Vector3f(0.0f, 0.0f, 0.0f);
-	}
-
-	Vertex(Vector3f _pos, Vector2f _uv, Vector3f _normal)
-	{
-		pos = _pos;
-		uv = _uv;
-		normal = _normal;
-	}
-};
-
-#endif /* UTIL_3D */
+#endif /* UTILS_H */

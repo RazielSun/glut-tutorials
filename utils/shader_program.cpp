@@ -1,7 +1,7 @@
 
 #include <iostream>
 #include <assert.h>
-#include "util_shader_program.h"
+#include "shader_program.h"
 
 ShaderProgram::ShaderProgram()
 {

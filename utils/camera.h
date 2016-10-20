@@ -1,8 +1,8 @@
 
-#ifndef UTIL_CAMERA
-#define UTIL_CAMERA
+#ifndef CAMERA_H
+#define CAMERA_H
 
-#include "util_3d.h"
+#include "utils.h"
 
 class Camera {
 public:
@@ -42,4 +42,4 @@ private:
 	Vector3f m_up;
 };
 
-#endif /* UTIL_CAMERA */
+#endif /* CAMERA_H */
