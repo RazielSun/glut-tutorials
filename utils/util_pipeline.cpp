@@ -53,7 +53,8 @@ const Matrix4f* Pipeline::GetViewTrans()
 {
     Matrix4f CameraRotateTrans, CameraTranslationTrans;
 
-    CameraTranslationTrans.InitTranslationTransform(m_camera.GetPos());
+    Vector3f pos = m_camera.GetPos();
+    CameraTranslationTrans.InitTranslationTransform(-pos.x, -pos.y, -pos.z);
     CameraRotateTrans.InitCameraTransform(m_camera.GetTarget(), m_camera.GetUp());
 
     m_View = CameraRotateTrans * CameraTranslationTrans;
