@@ -23,8 +23,9 @@ const char* WINDOW_NAME = "Tutorial 22";
 
 DirectionLight directionLight;
 
-Camera *camera = NULL;
-LightProgram *program = NULL;
+Camera* camera = NULL;
+LightProgram* program = NULL;
+Mesh* mesh = NULL;
 
 static std::string vertex_shader = ""
 "attribute vec3 position;"
@@ -134,13 +135,15 @@ void render ()
 {
 	camera->OnRender();
 
-	glClear(GL_COLOR_BUFFER_BIT);
+	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 
 	static float scale = 0.0f;
-	scale += 0.01f;
+	scale += 0.1f;
 
 	Pipeline p;
-	p.Pos(0.0f, 0.0f, 3.0f);
+	p.Scale(0.1f, 0.1f, 0.1f);
+	p.Rotate(0.0f, scale, 0.0f);
+	p.Pos(0.0f, 0.0f, 10.0f);
 	p.SetPerspectiveProj(60.0f, WINDOW_WIDTH, WINDOW_HEIGHT, 1.0f, 100.0f);
 	p.SetCamera(*camera);
 	
@@ -150,20 +153,7 @@ void render ()
 	program->SetPointLights(0, NULL);
 	program->SetSpotLights(0, NULL);
 
-	// glEnableVertexAttribArray(0);
-	// glEnableVertexAttribArray(1);
-	// glEnableVertexAttribArray(2);
-
-	// glBindBuffer(GL_ARRAY_BUFFER, vbo);
-	// glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), 0);
-	// glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (const GLvoid*)12);
-	// glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (const GLvoid*)20);
-	// glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
-	// glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-
-	// glDisableVertexAttribArray(0);
-	// glDisableVertexAttribArray(1);
-	// glDisableVertexAttribArray(2);
+	mesh->Render();
 }
 
 void createShaderProgram ()
@@ -216,18 +206,24 @@ int main (int argc, char *argv[])
 {
 	init();
 
-	camera = new Camera(WINDOW_WIDTH, WINDOW_HEIGHT);
-	camera->SetPos(0.0f, 2.0f, -2.0f);
-	// camera->LookAt(0.0f, 0.0f, 3.0f);
+	Vector3f pos(3.0f, 7.0f, -10.0f);
+	Vector3f target(0.0f, -0.2f, 1.0f);
+	Vector3f up(0.0f, 1.0f, 0.0f);
+
+	camera = new Camera(WINDOW_WIDTH, WINDOW_HEIGHT, pos, target, up);
+
+	mesh = new Mesh();
+	mesh->LoadMesh("content/phoenix_ugv.md2");
 
 	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
     glFrontFace(GL_CW);
     glCullFace(GL_BACK);
     glEnable(GL_CULL_FACE);
+    glEnable(GL_DEPTH_TEST);
 
     directionLight.Color = Vector3f(1.0f, 1.0f, 1.0f);
-    directionLight.AmbientIntensity = 0.1f; 
-    directionLight.DiffuseIntensity = 0.1f;
+    directionLight.AmbientIntensity = 1.0f; 
+    directionLight.DiffuseIntensity = 0.01f;
     directionLight.Direction = Vector3f(1.0f, -1.0f, 0.0f);
     
 	createShaderProgram();

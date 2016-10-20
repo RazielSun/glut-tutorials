@@ -2,7 +2,7 @@
 #include <assert.h>
 #include "mesh.h"
 
-MeshEntry::MeshEntry()
+Mesh::MeshEntry::MeshEntry()
 {
 	VB = INVALID_OGL_VALUE;
 	IB = INVALID_OGL_VALUE;
@@ -10,7 +10,7 @@ MeshEntry::MeshEntry()
 	materialIndex = INVALID_MATERIAL;
 }
 
-MeshEntry::~MeshEntry()
+Mesh::MeshEntry::~MeshEntry()
 {
 	if (VB != INVALID_OGL_VALUE)
     {
@@ -23,11 +23,11 @@ MeshEntry::~MeshEntry()
     }
 }
 
-void MeshEntry::Init(const std::vector<Vertex>& verticies, const std::vector<unsigned int>& indices)
+void Mesh::MeshEntry::Init(const std::vector<Vertex>& vertices, const std::vector<unsigned int>& indices)
 {
     glGenBuffers(1, &VB);
   	glBindBuffer(GL_ARRAY_BUFFER, VB);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex) * verticies.size(), &verticies[0], GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex) * vertices.size(), &vertices[0], GL_STATIC_DRAW);
 
 	numIndices = indices.size();
 
@@ -111,7 +111,7 @@ bool Mesh::InitFromScene(const aiScene* scene, const std::string& fileName)
 
 	for (unsigned int i = 0; i < m_Entries.size(); i++)
 	{
-		const aiMesh* mesh = aiScene->mMeshes[i];
+		const aiMesh* mesh = scene->mMeshes[i];
 		InitMesh(i, mesh);
 	}
 	return InitMaterials(scene, fileName);
@@ -130,11 +130,11 @@ void Mesh::InitMesh(unsigned int Index, const aiMesh* mesh)
 	{
 		const aiVector3D* pos = &(mesh->mVertices[i]);
 		const aiVector3D* normal = &(mesh->mNormals[i]);
-		const aiVector3D* uv = mesh->HasTextureCoords(0) ? &(mesh->mTextureCoords[0][i]) : Zero3D;
+		const aiVector3D* uv = mesh->HasTextureCoords(0) ? &(mesh->mTextureCoords[0][i]) : &Zero3D;
 
 		Vertex v(Vector3f(pos->x, pos->y, pos->z), Vector2f(uv->x, uv->y), Vector3f(normal->x, normal->y, normal->z));
 
-		Verticies.push_back(v);
+		vertices.push_back(v);
 	}
 
 	for (unsigned int i = 0; i < mesh->mNumFaces; i++)
