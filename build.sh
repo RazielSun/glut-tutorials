@@ -11,7 +11,9 @@ utils/utils.cpp \
 utils/texture.cpp \
 utils/pipeline.cpp \
 utils/camera.cpp \
-utils/shader_program.cpp \
-utils/light.cpp \
 utils/mesh.cpp \
+utils/shadow_map_fbo.cpp \
+utils/shader_program.cpp \
+utils/light_program.cpp \
+utils/shadow_program.cpp \
 `Magick++-config --ldflags --libs`

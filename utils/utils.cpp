@@ -2,6 +2,28 @@
 #include <stdio.h>
 #include "utils.h"
 
+bool ReadFile(const char* fileName, std::string& outFile)
+{
+    std::ifstream f;
+    f.open(fileName);
+    
+    bool success = false;
+    
+    if (f.is_open()) {
+        std::string line;
+        while (getline(f, line)) {
+            outFile.append(line);
+            outFile.append("\n");
+        }
+        
+        f.close();
+        
+        success = true;
+    }
+    
+    return success;
+}
+
 Vector3f Vector3f::Cross(const Vector3f& v)
 {
 	const float _x = y * v.z - z * v.y;

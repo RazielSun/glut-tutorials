@@ -3,6 +3,11 @@
 #define UTILS_H
 
 #include <math.h>
+#include <iostream>
+#include <fstream>
+#include <string>
+
+bool ReadFile(const char* fileName, std::string& outFile);
 
 #define ARRAY_SIZE_IN_ELEMENTS(a) (sizeof(a)/sizeof(a[0]))
 

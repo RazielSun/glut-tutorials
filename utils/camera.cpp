@@ -10,8 +10,8 @@ Camera::Camera(int width, int height)
 	m_windowWidth = width;
 	m_windowHeight = height;
 	m_pos = Vector3f(0.0f, 0.0f, 0.0f);
-
 	m_target = Vector3f(0.0f, 0.0f, 1.0f);
+    m_target.Normalize();
 	m_up = Vector3f(0.0f, 1.0f, 0.0f);
 
 	Init();
@@ -223,17 +223,17 @@ bool Camera::OnKeyboard(int key)
 	return value;
 }
 
-const Vector3f& Camera::GetPos()
+const Vector3f& Camera::GetPos() const
 {
 	return m_pos;
 }
 
-const Vector3f& Camera::GetTarget()
+const Vector3f& Camera::GetTarget() const
 {
 	return m_target;
 }
 
-const Vector3f& Camera::GetUp()
+const Vector3f& Camera::GetUp() const
 {
 	return m_up;
 }

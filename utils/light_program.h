@@ -4,7 +4,6 @@
 
 #include "utils.h"
 #include "shader_program.h"
-#include <GL/glew.h>
 
 struct BaseLight {
 	Vector3f Color;

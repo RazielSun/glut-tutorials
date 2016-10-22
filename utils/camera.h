@@ -16,9 +16,9 @@ public:
 	bool OnKeyboard(int key);
 	void OnRender();
 
-	const Vector3f& GetPos();
-	const Vector3f& GetTarget();
-	const Vector3f& GetUp();
+	const Vector3f& GetPos() const;
+	const Vector3f& GetTarget() const;
+	const Vector3f& GetUp() const;
 
 private:
 	void Init();

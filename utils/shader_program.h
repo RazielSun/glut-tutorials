@@ -13,16 +13,21 @@ public:
 	virtual void Link();
 	void Compile();
 
-	void AddShader(GLenum shaderType, const char* shader);
+	void Enable();
+
+	bool AddShader(GLenum shaderType, const char* fileName);
 
 	void SetWVP(const Matrix4f* wvp);
 	void SetWorld(const Matrix4f* world);
-	GLuint GetUniformLocation(const char* name);
+	void SetTextureUnit(unsigned int textureUnit);
 
 protected:
+	GLuint GetUniformLocation(const char* name);
+
 	GLuint m_shaderProgram;
 	GLuint m_uWorld;
 	GLuint m_uWVP;
+	GLuint m_texture;
 };
 
 

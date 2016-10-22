@@ -31,9 +31,16 @@ void Pipeline::SetPerspectiveProj(float fov, int width, int height, float near, 
     m_projInfo.far = far;
 }
 
+void Pipeline::SetCamera(const Vector3f& pos, const Vector3f& target, const Vector3f& up)
+{
+    m_cameraPos = pos;
+    m_cameraDir = target;
+    m_cameraUp = up;
+}
+
 void Pipeline::SetCamera(const Camera& camera)
 {
-	m_camera = camera;
+    SetCamera(camera.GetPos(), camera.GetTarget(), camera.GetUp());
 }
 
 const Matrix4f* Pipeline::GetWorldTrans()
@@ -53,9 +60,8 @@ const Matrix4f* Pipeline::GetViewTrans()
 {
     Matrix4f CameraRotateTrans, CameraTranslationTrans;
 
-    Vector3f pos = m_camera.GetPos();
-    CameraTranslationTrans.InitTranslationTransform(-pos.x, -pos.y, -pos.z);
-    CameraRotateTrans.InitCameraTransform(m_camera.GetTarget(), m_camera.GetUp());
+    CameraTranslationTrans.InitTranslationTransform(-m_cameraPos.x, -m_cameraPos.y, -m_cameraPos.z);
+    CameraRotateTrans.InitCameraTransform(m_cameraDir, m_cameraUp);
 
     m_View = CameraRotateTrans * CameraTranslationTrans;
 

@@ -1,5 +1,5 @@
 
-#include <iostream>
+#include <stdio.h>
 #include <assert.h>
 #include "shader_program.h"
 
@@ -20,11 +20,28 @@ bool ShaderProgram::Init()
     return true;
 }
 
-void ShaderProgram::AddShader(GLenum shaderType, const char* shaderText)
+void ShaderProgram::Enable()
+{
+    glUseProgram(m_shaderProgram);
+}
+
+bool ShaderProgram::AddShader(GLenum shaderType, const char* fileName)
 {
 	GLuint shader = glCreateShader(shaderType);
 
-	glShaderSource(shader, 1, &shaderText, NULL);
+    std::string s;
+
+    if (!ReadFile(fileName, s))
+    {
+        return false;
+    }
+
+    const GLchar* p[1];
+    p[0] = s.c_str();
+    GLint lengths[1] = { (GLint)s.size() };
+
+    glShaderSource(shader, 1, p, lengths);
+
     glCompileShader(shader);
 
     GLint success;
@@ -39,6 +56,8 @@ void ShaderProgram::AddShader(GLenum shaderType, const char* shaderText)
     }
 
     glAttachShader(m_shaderProgram, shader);
+
+    return true;
 }
 
 void ShaderProgram::Compile()
@@ -78,6 +97,7 @@ void ShaderProgram::Link()
 {
 	m_uWVP = GetUniformLocation("WVP");
     m_uWorld = GetUniformLocation("world");
+    m_texture = GetUniformLocation("sampler");
 }
 
 void ShaderProgram::SetWVP(const Matrix4f* wvp)
@@ -88,6 +108,11 @@ void ShaderProgram::SetWVP(const Matrix4f* wvp)
 void ShaderProgram::SetWorld(const Matrix4f* world)
 {
 	glUniformMatrix4fv(m_uWorld, 1, GL_TRUE, (const GLfloat*)world);
+}
+
+void ShaderProgram::SetTextureUnit(unsigned int textureUnit)
+{
+    glUniform1i(m_texture, textureUnit);
 }
 
 GLuint ShaderProgram::GetUniformLocation(const char* name)
