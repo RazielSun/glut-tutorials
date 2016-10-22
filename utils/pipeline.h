@@ -5,6 +5,22 @@
 #include "utils.h"
 #include "camera.h"
 
+struct PersProjInfo {
+	float FOV;
+	int Width;
+	int Height;
+	float zNear;
+	float zFar;
+
+	PersProjInfo() {
+		zNear = 1.0f;
+		zFar = 50.0f;
+		Width = 0;
+		Height = 0;
+		FOV = 60.0f;
+	}
+};
+
 class Pipeline {
 public:
 	Pipeline()
@@ -17,7 +33,7 @@ public:
 	void Scale(float scaleX, float scaleY, float scaleZ);
 	void Pos(float x, float y, float z);
 	void Rotate(float rotateX, float rotateY, float rotateZ);
-	void SetPerspectiveProj(float fov, int width, int height, float near, float far);
+	void SetPerspectiveProj(const PersProjInfo& info);
 	void SetCamera(const Vector3f& pos, const Vector3f& target, const Vector3f& up);
 	void SetCamera(const Camera& camera);
 
@@ -30,11 +46,13 @@ private:
 	Vector3f m_scale;
 	Vector3f m_pos;
 	Vector3f m_rotate;
-	ProjInfo m_projInfo;
+	
 	Matrix4f m_World;
 	Matrix4f m_View;
 	Matrix4f m_Proj;
 	Matrix4f m_WVP;
+
+	PersProjInfo m_projInfo;
 
 	Vector3f m_cameraPos;
 	Vector3f m_cameraDir;

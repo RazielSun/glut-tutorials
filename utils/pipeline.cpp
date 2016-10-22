@@ -22,13 +22,9 @@ void Pipeline::Rotate(float rotateX, float rotateY, float rotateZ)
 	m_rotate.z = rotateZ;
 }
 
-void Pipeline::SetPerspectiveProj(float fov, int width, int height, float near, float far)
+void Pipeline::SetPerspectiveProj(const PersProjInfo& info)
 {
-    m_projInfo.FOV = fov;
-    m_projInfo.width = width;
-    m_projInfo.height = height;
-    m_projInfo.near = near;
-    m_projInfo.far = far;
+    m_projInfo = info;
 }
 
 void Pipeline::SetCamera(const Vector3f& pos, const Vector3f& target, const Vector3f& up)
@@ -72,7 +68,7 @@ const Matrix4f* Pipeline::GetProjTrans()
 {
     Matrix4f PerspProjTrans;
 
-    PerspProjTrans.InitPerspectiveProj(m_projInfo.FOV, m_projInfo.width, m_projInfo.height, m_projInfo.near, m_projInfo.far);
+    PerspProjTrans.InitPerspectiveProj(m_projInfo.FOV, m_projInfo.Width, m_projInfo.Height, m_projInfo.zNear, m_projInfo.zFar);
 
     m_Proj = PerspProjTrans;
 

@@ -18,23 +18,6 @@ bool ReadFile(const char* fileName, std::string& outFile);
 
 #define INVALID_OGL_VALUE 0xffffffff
 
-struct ProjInfo {
-	float near;
-    float far;
-    int width;
-    int height;
-    float FOV;
-
-    ProjInfo()
-    {
-    	near = 1.0f;
-		far = 1000.0f;
-		width = 640;
-		height = 480;
-		FOV = 60.0f;
-    }
-};
-
 struct Vector2i {
 	int x;
 	int y;

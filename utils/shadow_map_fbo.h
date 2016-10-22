@@ -16,6 +16,7 @@ public:
 
 private:
 	GLuint m_fbo;
+	GLuint m_rbo;
 	GLuint m_shadowMap;
 };
 

@@ -194,12 +194,12 @@ bool Mesh::InitMaterials(const aiScene* scene, const std::string& fileName)
             }
         }
 
-        if (!m_Textures[i])
-        {
-            m_Textures[i] = new Texture(GL_TEXTURE_2D, "content/white.png");
+        // if (!m_Textures[i])
+        // {
+        //     m_Textures[i] = new Texture(GL_TEXTURE_2D, "content/white.png");
 
-            success = m_Textures[i]->Load();
-        }
+        //     success = m_Textures[i]->Load();
+        // }
     }
 
     return success;

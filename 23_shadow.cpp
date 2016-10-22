@@ -23,12 +23,14 @@
 
 const char* WINDOW_NAME = "Tutorial 23";
 
-SpotLight spotLight;
+PersProjInfo projInfo;
+
+SpotLight spotLight[MAX_LIGHTS];
 
 Camera* camera = NULL;
 
 ShadowMapFBO shadowMapFBO;
-ShadowProgram* program = NULL;
+ShadowProgram* shadowProgram = NULL;
 
 Mesh* mesh = NULL;
 Mesh* quad = NULL;
@@ -39,16 +41,16 @@ void RenderShadowMapPass ()
 {
 	shadowMapFBO.BindForWriting();
 
-	glClear(GL_DEPTH_BUFFER_BIT);
+	glClear(GL_DEPTH_BUFFER_BIT);	
 
 	Pipeline p;
     p.Scale(0.1f, 0.1f, 0.1f);
     p.Rotate(0.0f, scale, 0.0f);
     p.Pos(0.0f, 0.0f, 5.0f);
-    p.SetCamera(spotLight.Position, spotLight.Direction, Vector3f(0.0f, 1.0f, 0.0f));
-    p.SetPerspectiveProj(60.0f, WINDOW_WIDTH, WINDOW_HEIGHT, 1.0f, 60.0f);
-    program->SetWVP(p.GetTrans());
-    
+    p.SetCamera(spotLight[0].Position, spotLight[0].Direction, Vector3f(0.0f, 1.0f, 0.0f));
+    p.SetPerspectiveProj(projInfo);
+    shadowProgram->SetWVP(p.GetTrans());
+
     mesh->Render();
     
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -58,15 +60,15 @@ void RenderPass ()
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	program->SetTextureUnit(0);
+	shadowProgram->SetTextureUnit(0);
     shadowMapFBO.BindForReading(GL_TEXTURE0);
 
     Pipeline p;
     p.Scale(5.0f, 5.0f, 5.0f);
     p.Pos(0.0f, 0.0f, 10.0f);
     p.SetCamera(camera->GetPos(), camera->GetTarget(), camera->GetUp());
-    p.SetPerspectiveProj(60.0f, WINDOW_WIDTH, WINDOW_HEIGHT, 1.0f, 60.0f);
-    program->SetWVP(p.GetTrans());
+    p.SetPerspectiveProj(projInfo);
+    shadowProgram->SetWVP(p.GetTrans());
 
     quad->Render();
 }
@@ -76,23 +78,23 @@ void Render ()
 	camera->OnRender();
 	scale += 0.05f;
 
-	RenderShadowMapPass ();
-	RenderPass ();
+	RenderShadowMapPass();
+	RenderPass();
 }
 
 void createShadowProgram ()
 {
-	program = new ShadowProgram();
-	if (!program->Init()) {
+	shadowProgram = new ShadowProgram();
+	if (!shadowProgram->Init()) {
 		exit(1);
 	}
 
-	program->AddShader(GL_VERTEX_SHADER, "shaders/shadow_shader.vs");
-	program->AddShader(GL_FRAGMENT_SHADER, "shaders/shadow_shader.fs");
+	shadowProgram->AddShader(GL_VERTEX_SHADER, "shaders/shadow_shader.vs");
+	shadowProgram->AddShader(GL_FRAGMENT_SHADER, "shaders/shadow_shader.fs");
 
-	program->Compile();
-	program->Link();
-	program->Enable();
+	shadowProgram->Compile();
+	shadowProgram->Link();
+	shadowProgram->Enable();
 }
 
 SDL_Window *window;
@@ -141,16 +143,18 @@ int main (int argc, char *argv[])
     glEnable(GL_DEPTH_TEST);
 
 	shadowMapFBO.Init(WINDOW_WIDTH, WINDOW_HEIGHT);
-
 	createShadowProgram();
 
-	spotLight.AmbientIntensity = 0.0f;
-    spotLight.DiffuseIntensity = 0.9f;
-    spotLight.Color = Vector3f(1.0f, 1.0f, 1.0f);
-    spotLight.Attenuation.Linear = 0.01f;
-    spotLight.Position  = Vector3f(-20.0, 20.0, 5.0f);
-    spotLight.Direction = Vector3f(1.0f, -1.0f, 0.0f);
-    spotLight.Cutoff =  20.0f;
+	spotLight[0].AmbientIntensity = 0.0f;
+    spotLight[0].DiffuseIntensity = 0.9f;
+    spotLight[0].Color = Vector3f(1.0f, 1.0f, 1.0f);
+    spotLight[0].Attenuation.Linear = 0.01f;
+    spotLight[0].Position  = Vector3f(-20.0, 20.0, 5.0f);
+    spotLight[0].Direction = Vector3f(1.0f, -1.0f, 0.0f);
+    spotLight[0].Cutoff =  20.0f;
+
+    projInfo.Width = WINDOW_WIDTH;
+    projInfo.Height = WINDOW_HEIGHT;
 
 	mesh = new Mesh();
 	mesh->LoadMesh("content/phoenix_ugv.md2");
