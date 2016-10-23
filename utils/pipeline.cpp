@@ -39,7 +39,7 @@ void Pipeline::SetCamera(const Camera& camera)
     SetCamera(camera.GetPos(), camera.GetTarget(), camera.GetUp());
 }
 
-const Matrix4f* Pipeline::GetWorldTrans()
+const Matrix4f& Pipeline::GetWorldTrans()
 {
     Matrix4f ScaleTrans, RotateTrans, TranslationTrans;
 
@@ -49,10 +49,10 @@ const Matrix4f* Pipeline::GetWorldTrans()
 
     m_World = TranslationTrans * RotateTrans * ScaleTrans;
 
-    return &m_World;
+    return m_World;
 }
 
-const Matrix4f* Pipeline::GetViewTrans()
+const Matrix4f& Pipeline::GetViewTrans()
 {
     Matrix4f CameraRotateTrans, CameraTranslationTrans;
 
@@ -61,10 +61,10 @@ const Matrix4f* Pipeline::GetViewTrans()
 
     m_View = CameraRotateTrans * CameraTranslationTrans;
 
-    return &m_View;
+    return m_View;
 }
 
-const Matrix4f* Pipeline::GetProjTrans()
+const Matrix4f& Pipeline::GetProjTrans()
 {
     Matrix4f PerspProjTrans;
 
@@ -72,15 +72,15 @@ const Matrix4f* Pipeline::GetProjTrans()
 
     m_Proj = PerspProjTrans;
 
-    return &m_Proj;
+    return m_Proj;
 }
 
-const Matrix4f* Pipeline::GetTrans()
+const Matrix4f& Pipeline::GetTrans()
 {
 	GetWorldTrans();
     GetViewTrans();
     GetProjTrans();
 
     m_WVP = m_Proj * m_View * m_World;
-    return &m_WVP;
+    return m_WVP;
 }

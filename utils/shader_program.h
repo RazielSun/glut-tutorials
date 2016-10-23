@@ -17,8 +17,8 @@ public:
 
 	bool AddShader(GLenum shaderType, const char* fileName);
 
-	void SetWVP(const Matrix4f* wvp);
-	void SetWorld(const Matrix4f* world);
+	void SetWVP(const Matrix4f& wvp);
+	void SetWorld(const Matrix4f& world);
 	void SetTextureUnit(unsigned int textureUnit);
 
 protected:

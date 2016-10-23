@@ -37,10 +37,10 @@ public:
 	void SetCamera(const Vector3f& pos, const Vector3f& target, const Vector3f& up);
 	void SetCamera(const Camera& camera);
 
-	const Matrix4f* GetWorldTrans();
-	const Matrix4f* GetViewTrans();
-	const Matrix4f* GetProjTrans();
-	const Matrix4f* GetTrans();
+	const Matrix4f& GetWorldTrans();
+	const Matrix4f& GetViewTrans();
+	const Matrix4f& GetProjTrans();
+	const Matrix4f& GetTrans();
 
 private:
 	Vector3f m_scale;

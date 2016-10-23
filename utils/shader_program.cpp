@@ -100,14 +100,14 @@ void ShaderProgram::Link()
     m_texture = GetUniformLocation("sampler");
 }
 
-void ShaderProgram::SetWVP(const Matrix4f* wvp)
+void ShaderProgram::SetWVP(const Matrix4f& wvp)
 {
-	glUniformMatrix4fv(m_uWVP, 1, GL_TRUE, (const GLfloat*)wvp);
+	glUniformMatrix4fv(m_uWVP, 1, GL_TRUE, (const GLfloat*)wvp.m);
 }
 
-void ShaderProgram::SetWorld(const Matrix4f* world)
+void ShaderProgram::SetWorld(const Matrix4f& world)
 {
-	glUniformMatrix4fv(m_uWorld, 1, GL_TRUE, (const GLfloat*)world);
+	glUniformMatrix4fv(m_uWorld, 1, GL_TRUE, (const GLfloat*)world.m);
 }
 
 void ShaderProgram::SetTextureUnit(unsigned int textureUnit)
