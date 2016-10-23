@@ -1,12 +1,14 @@
 
 #include <assert.h>
 #include <math.h>
+#include <iostream>
+
 #include "utils/utils.h"
+#include "utils/skybox.h"
 #include "utils/camera.h"
 #include "utils/pipeline.h"
 #include "utils/light_program.h"
 #include "utils/mesh.h"
-#include <iostream>
 
 #include <GL/glew.h>
 #include <SDL2/SDL.h>
@@ -27,8 +29,7 @@ DirectionLight directionLight;
 Camera* camera = NULL;
 
 LightProgram *lightProgram = NULL;
-
-Texture* ground = NULL;
+SkyBoxProgram* skyboxProgram = NULL;
 
 Mesh* mesh = NULL;
 
