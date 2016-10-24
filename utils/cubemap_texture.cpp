@@ -1,5 +1,6 @@
 
-#include <stdio>
+#include <iostream>
+#include "utils.h"
 #include "cubemap_texture.h"
 
 static const GLenum types[6] = {  GL_TEXTURE_CUBE_MAP_POSITIVE_X,
@@ -53,7 +54,7 @@ bool CubemapTexture::Load()
             pImage->write(&blob, "RGBA");
         }
         catch (Magick::Error& Error) {
-            cout << "Error loading texture '" << m_fileNames[i] << "': " << Error.what() << endl;
+            std::cout << "Error loading texture '" << m_fileNames[i] << "': " << Error.what() << std::endl;
             delete pImage;
             return false;
         }

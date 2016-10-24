@@ -23,64 +23,37 @@
 const char* WINDOW_NAME = "Tutorial 25";
 
 PersProjInfo projInfo;
-
 DirectionLight directionLight;
 
 Camera* camera = NULL;
-
 LightProgram *lightProgram = NULL;
-SkyBoxProgram* skyboxProgram = NULL;
-
 Mesh* mesh = NULL;
+SkyBox *skyBox = NULL;
 
 static float scale = 0.0f;
-
-void RenderPass ()
-{
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-	lightProgram->Enable();
-
-    shadowMapFBO.BindForReading(GL_TEXTURE1);
-
-    Pipeline p;
-    p.SetPerspectiveProj(projInfo);
-
-    p.Scale(10.0f, 10.0f, 10.0f);
-    p.Pos(0.0f, 0.0f, 1.0f);
-    p.Rotate(90.0f, 0.0f, 0.0f);
-
-    p.SetCamera(camera->GetPos(), camera->GetTarget(), camera->GetUp());
-    lightProgram->SetWVP(p.GetTrans());
-    lightProgram->SetWorld(p.GetWorldTrans());
-
-    p.SetCamera(spotLight[0].Position, spotLight[0].Direction, Vector3f(0.0f, 1.0f, 0.0f));
-    lightProgram->SetLightWVP(p.GetTrans());
-
-    ground->Bind(GL_TEXTURE0);
-    quad->Render();
-
-    p.Scale(0.1f, 0.1f, 0.1f);
-    p.Rotate(0.0f, scale, 0.0f);
-    p.Pos(0.0f, 0.0f, 3.0f);
-
-    p.SetCamera(camera->GetPos(), camera->GetTarget(), camera->GetUp());
-    lightProgram->SetWVP(p.GetTrans());
-    lightProgram->SetWorld(p.GetWorldTrans());
-
-    p.SetCamera(spotLight[0].Position, spotLight[0].Direction, Vector3f(0.0f, 1.0f, 0.0f));
-    lightProgram->SetLightWVP(p.GetTrans());
-
-    mesh->Render();
-}
 
 void Render ()
 {
 	camera->OnRender();
 	scale += 0.05f;
 
-	RenderShadowMapPass();
-	RenderPass();
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	lightProgram->Enable();
+
+	Pipeline p;
+	p.Scale(0.1f, 0.1f, 0.1f);
+    p.Rotate(0.0f, scale, 0.0f);
+    p.Pos(0.0f, -5.0f, 3.0f);
+    p.SetPerspectiveProj(projInfo);
+    p.SetCamera(camera->GetPos(), camera->GetTarget(), camera->GetUp());
+        
+    lightProgram->SetWVP(p.GetTrans());
+    lightProgram->SetWorld(p.GetWorldTrans());
+
+	mesh->Render();
+
+	skyBox->Render();
 }
 
 void createLightProgram ()
@@ -96,9 +69,9 @@ void createLightProgram ()
 	lightProgram->Compile();
 	lightProgram->Link();
 
-	// lightProgram->SetDirectionLight(directionLight);
+	lightProgram->SetDirectionLight(directionLight);
     lightProgram->SetTextureUnit(0);
-    lightProgram->SetShadowMapTextureUnit(1);
+    // lightProgram->SetShadowMapTextureUnit(1);
     lightProgram->Enable();
 }
 
@@ -139,8 +112,8 @@ int main (int argc, char *argv[])
 {
 	init();
 
-	Vector3f Pos(3.0f, 8.0f, -10.0f);
-    Vector3f Target(0.0f, -0.2f, 1.0f);
+	Vector3f Pos(0.0f, 1.0f, -10.0f);
+    Vector3f Target(0.0f, 0.0f, 1.0f);
     Vector3f Up(0.0, 1.0f, 0.0f);
 
 	camera = new Camera(WINDOW_WIDTH, WINDOW_HEIGHT, Pos, Target, Up);
@@ -152,8 +125,8 @@ int main (int argc, char *argv[])
     glEnable(GL_DEPTH_TEST);
 
     directionLight.Color = Vector3f(1.0f, 1.0f, 1.0f);
-    directionLight.AmbientIntensity = 0.1f; 
-    directionLight.DiffuseIntensity = 0.1f;
+    directionLight.AmbientIntensity = 0.2f; 
+    directionLight.DiffuseIntensity = 0.8f;
     directionLight.Direction = Vector3f(1.0f, -1.0f, 0.0f);
 
     projInfo.Width = WINDOW_WIDTH;
@@ -163,6 +136,17 @@ int main (int argc, char *argv[])
 
 	mesh = new Mesh();
 	mesh->LoadMesh("content/phoenix_ugv.md2");
+
+	skyBox = new SkyBox(camera, projInfo);
+	if (!skyBox->Init("content/cubemap/",
+		"right.jpg",
+		"left.jpg",
+		"top.jpg",
+		"bottom.jpg",
+		"front.jpg",
+		"back.jpg")) {
+		return 1;
+	}
 
 	bool running = true;
 
