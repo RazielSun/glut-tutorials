@@ -67,6 +67,7 @@ void ShaderProgram::Compile()
 	glBindAttribLocation(m_shaderProgram, 0, "position");
     glBindAttribLocation(m_shaderProgram, 1, "texCoord");
     glBindAttribLocation(m_shaderProgram, 2, "normal");
+    glBindAttribLocation(m_shaderProgram, 3, "tangent");
 
     glLinkProgram(m_shaderProgram);
     glGetProgramiv(m_shaderProgram, GL_LINK_STATUS, &success);

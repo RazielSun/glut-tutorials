@@ -16,8 +16,7 @@
 #include <OpenGL/glu.h>
 
 #define COLOR_TEXTURE_UNIT GL_TEXTURE0
-#define SHADOW_TEXTURE_UNIT GL_TEXTURE1
-#define NORMAL_TEXTURE_UNIT GL_TEXTURE2
+#define NORMAL_TEXTURE_UNIT GL_TEXTURE1
 
 #define WINDOW_WIDTH 1024
 #define WINDOW_HEIGHT 768
@@ -33,7 +32,12 @@ Camera* camera = NULL;
 
 LightProgram* lightProgram = NULL;
 Texture* texture = NULL;
+Texture* textureTangent = NULL;
+Texture* textureNonTangent = NULL;
 Mesh* mesh = NULL;
+
+static bool useTangent = true;
+static float scale = 0.0f;
 
 void render ()
 {
@@ -41,7 +45,6 @@ void render ()
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	static float scale = 0.0f;
 	scale += 0.1f;
 
 	Pipeline p;
@@ -59,6 +62,12 @@ void render ()
 
 	texture->Bind(COLOR_TEXTURE_UNIT);
 
+	if (useTangent) {
+		textureTangent->Bind(NORMAL_TEXTURE_UNIT);
+	} else {
+		textureNonTangent->Bind(NORMAL_TEXTURE_UNIT);
+	}
+
 	mesh->Render();
 }
 
@@ -69,15 +78,15 @@ void createLightProgram ()
 		exit(1);
 	}
 
-	lightProgram->AddShader(GL_VERTEX_SHADER, "shaders/light_shader.vs");
-	lightProgram->AddShader(GL_FRAGMENT_SHADER, "shaders/light_shader.fs");
+	lightProgram->AddShader(GL_VERTEX_SHADER, "shaders/light_bump_shader.vs");
+	lightProgram->AddShader(GL_FRAGMENT_SHADER, "shaders/light_bump_shader.fs");
 
 	lightProgram->Compile();
 	lightProgram->Link();
 
 	lightProgram->SetDirectionLight(directionLight);
     lightProgram->SetTextureUnit(0);
-    // lightProgram->SetShadowMapTextureUnit(1);
+    lightProgram->SetNormalMapUnit(1);
     lightProgram->Enable();
 }
 
@@ -148,6 +157,16 @@ int main (int argc, char *argv[])
 		return 1;
 	}
 
+	textureTangent = new Texture(GL_TEXTURE_2D, "content/normal_map.jpg");
+	if (!textureTangent->Load()) {
+		return 1;
+	}
+
+	textureNonTangent = new Texture(GL_TEXTURE_2D, "content/normal_up.jpg");
+	if (!textureNonTangent->Load()) {
+		return 1;
+	}
+
 	bool running = true;
 
 	while(running)
@@ -170,11 +189,8 @@ int main (int argc, char *argv[])
 					camera->OnKeyboard(event.key.keysym.sym);
 					switch(event.key.keysym.sym)
 					{
-						case SDLK_q:
-							directionLight.AmbientIntensity += 0.1f;
-							break;
-						case SDLK_w:
-							directionLight.AmbientIntensity -= 0.1f;
+						case SDLK_z:
+							useTangent = !useTangent;
 							break;
 						case SDLK_ESCAPE:
 							running = false;

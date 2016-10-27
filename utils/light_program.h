@@ -68,6 +68,7 @@ public:
 	void SetDirectionLight(const DirectionLight& light);
 	void SetPointLights(unsigned int numLights, const PointLight* pLights);
 	void SetSpotLights(unsigned int numLights, const SpotLight* sLights);
+	void SetNormalMapUnit(unsigned int textureUnit);
 
 	virtual bool Init();
 	virtual void Link();
@@ -78,6 +79,7 @@ private:
 	GLuint m_spotsCount;
 	PointLightGL m_points[MAX_POINT_LIGHTS];
 	SpotLightGL m_spots[MAX_SPOT_LIGHTS];
+	GLuint m_normalMap;
 };
 
 

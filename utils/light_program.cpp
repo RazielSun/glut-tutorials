@@ -87,6 +87,8 @@ void LightProgram::Link()
         sprintf(name, "spotLights[%d].Cutoff", i);
         m_spots[i].Cutoff = GetUniformLocation(name);
     }
+
+    m_normalMap = GetUniformLocation("normalMap");
 }
 
 void LightProgram::SetDirectionLight(const DirectionLight& light)
@@ -131,4 +133,9 @@ void LightProgram::SetSpotLights(unsigned int numLights, const SpotLight* sLight
         glUniform3f(m_spots[i].Direction, Direction.x, Direction.y, Direction.z);
         glUniform1f(m_spots[i].Cutoff, cosf(ToRadian(sLights[i].Cutoff)));
     }
+}
+
+void LightProgram::SetNormalMapUnit(unsigned int textureUnit)
+{
+    glUniform1i(m_normalMap, textureUnit);
 }

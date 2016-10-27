@@ -60,7 +60,7 @@ bool Mesh::LoadMesh(const std::string& fileName)
 	bool success = false;
 	Assimp::Importer Importer;
 
-    const aiScene* scene = Importer.ReadFile(fileName.c_str(), aiProcess_Triangulate | aiProcess_GenSmoothNormals | aiProcess_FlipUVs);
+    const aiScene* scene = Importer.ReadFile(fileName.c_str(), aiProcess_Triangulate | aiProcess_GenSmoothNormals | aiProcess_CalcTangentSpace | aiProcess_FlipUVs);
     
     if (scene)
     {
@@ -79,6 +79,7 @@ void Mesh::Render()
 	glEnableVertexAttribArray(0);
     glEnableVertexAttribArray(1);
     glEnableVertexAttribArray(2);
+    glEnableVertexAttribArray(3);
 
     for (unsigned int i = 0; i < m_Entries.size(); i++)
     {
@@ -86,6 +87,7 @@ void Mesh::Render()
         glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), 0);
         glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (const GLvoid*)12);
         glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (const GLvoid*)20);
+        glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (const GLvoid*)32);
 
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_Entries[i].IB);
 
@@ -102,6 +104,7 @@ void Mesh::Render()
     glDisableVertexAttribArray(0);
     glDisableVertexAttribArray(1);
     glDisableVertexAttribArray(2);
+    glDisableVertexAttribArray(3);
 }
 
 bool Mesh::InitFromScene(const aiScene* scene, const std::string& fileName)
@@ -131,8 +134,14 @@ void Mesh::InitMesh(unsigned int Index, const aiMesh* mesh)
 		const aiVector3D* pos = &(mesh->mVertices[i]);
 		const aiVector3D* normal = &(mesh->mNormals[i]);
 		const aiVector3D* uv = mesh->HasTextureCoords(0) ? &(mesh->mTextureCoords[0][i]) : &Zero3D;
+        const aiVector3D* tangent  = &(mesh->mTangents[i]);
 
-		Vertex v(Vector3f(pos->x, pos->y, pos->z), Vector2f(uv->x, uv->y), Vector3f(normal->x, normal->y, normal->z));
+		Vertex v(
+            Vector3f(pos->x, pos->y, pos->z),
+            Vector2f(uv->x, uv->y),
+            Vector3f(normal->x, normal->y, normal->z),
+            Vector3f(tangent->x, tangent->y, tangent->z)
+        );
 
 		vertices.push_back(v);
 	}

@@ -13,6 +13,7 @@ struct Vertex {
 	Vector3f pos;
 	Vector2f uv;
 	Vector3f normal;
+	Vector3f tangent;
 
 	Vertex() {}
 
@@ -21,6 +22,7 @@ struct Vertex {
 		pos = _pos;
 		uv = _uv;
 		normal = Vector3f(0.0f, 0.0f, 0.0f);
+		tangent = Vector3f(0.0f, 0.0f, 0.0f);
 	}
 
 	Vertex(Vector3f _pos, Vector2f _uv, Vector3f _normal)
@@ -28,6 +30,14 @@ struct Vertex {
 		pos = _pos;
 		uv = _uv;
 		normal = _normal;
+	}
+
+	Vertex(const Vector3f& _pos, const Vector2f& _uv, const Vector3f& _normal, const Vector3f& _tangent)
+	{
+		pos = _pos;
+		uv = _uv;
+		normal = _normal;
+		tangent = _tangent;
 	}
 };
 
