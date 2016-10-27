@@ -11,7 +11,7 @@
 
 class SkyBox {
 public:
-	SkyBox(const Camera& camera, const PersProjInfo& info);
+	SkyBox(const Camera* camera, const PersProjInfo& info);
 	~SkyBox();
 
 	bool Init(const std::string& dir,

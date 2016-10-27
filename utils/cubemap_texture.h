@@ -22,7 +22,7 @@ public:
 	void Bind(GLenum textureUnit);
 
 private:
-	std::string m_fileName[6];
+	std::string m_fileNames[6];
 	GLuint m_texture;
 };
 

@@ -9,12 +9,15 @@ outputName=$name".out"
 g++ $inputName `Magick++-config --cxxflags --cppflags` -lGLEW -lSDL2 -lassimp -framework OpenGL -o $outputName \
 utils/utils.cpp \
 utils/texture.cpp \
+utils/cubemap_texture.cpp \
 utils/pipeline.cpp \
 utils/camera.cpp \
 utils/mesh.cpp \
+utils/skybox.cpp \
 utils/shadow_map_fbo.cpp \
 utils/shader_program.cpp \
 utils/light_program.cpp \
 utils/light_shadow_program.cpp \
 utils/shadow_program.cpp \
+utils/skybox_program.cpp \
 `Magick++-config --ldflags --libs`
