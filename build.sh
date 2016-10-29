@@ -20,4 +20,5 @@ utils/light_program.cpp \
 utils/light_shadow_program.cpp \
 utils/shadow_program.cpp \
 utils/skybox_program.cpp \
+utils/gbuffer.cpp \
 `Magick++-config --ldflags --libs`

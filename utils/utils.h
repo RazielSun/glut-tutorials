@@ -16,6 +16,8 @@ bool ReadFile(const char* fileName, std::string& outFile);
 #define ToRadian(x) ((x) * M_PI / 180.0f)
 #define ToDegree(x) ((x) * 180.0f / M_PI)
 
+#define ZERO_MEM(a) memset(a, 0, sizeof(a))
+
 #define INVALID_OGL_VALUE 0xffffffff
 
 struct Vector2i {
