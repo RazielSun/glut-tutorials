@@ -21,4 +21,7 @@ utils/light_shadow_program.cpp \
 utils/shadow_program.cpp \
 utils/skybox_program.cpp \
 utils/gbuffer.cpp \
+utils/deferred_light_program.cpp \
+utils/deferred_dir_light_program.cpp \
+utils/deferred_point_light_program.cpp \
 `Magick++-config --ldflags --libs`

@@ -18,6 +18,7 @@ bool ReadFile(const char* fileName, std::string& outFile);
 
 #define ZERO_MEM(a) memset(a, 0, sizeof(a))
 
+#define INVALID_UNIFORM_LOCATION 0xffffffff
 #define INVALID_OGL_VALUE 0xffffffff
 
 struct Vector2i {
@@ -185,6 +186,7 @@ public:
 		return ret;
 	}
 
+	void InitIdentity();
 	void InitScaleTransform(float scaleX, float scaleY, float scaleZ);
     void InitRotateTransform(float rotateX, float rotateY, float rotateZ);
     void InitTranslationTransform(const Vector3f& pos);

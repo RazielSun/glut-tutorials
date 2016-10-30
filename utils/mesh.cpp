@@ -134,13 +134,11 @@ void Mesh::InitMesh(unsigned int Index, const aiMesh* mesh)
 		const aiVector3D* pos = &(mesh->mVertices[i]);
 		const aiVector3D* normal = &(mesh->mNormals[i]);
 		const aiVector3D* uv = mesh->HasTextureCoords(0) ? &(mesh->mTextureCoords[0][i]) : &Zero3D;
-        const aiVector3D* tangent  = &(mesh->mTangents[i]);
 
 		Vertex v(
             Vector3f(pos->x, pos->y, pos->z),
             Vector2f(uv->x, uv->y),
-            Vector3f(normal->x, normal->y, normal->z),
-            Vector3f(tangent->x, tangent->y, tangent->z)
+            Vector3f(normal->x, normal->y, normal->z)
         );
 
 		vertices.push_back(v);
