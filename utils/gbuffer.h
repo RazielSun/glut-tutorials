@@ -23,15 +23,18 @@ public:
 
     bool Init(unsigned int WindowWidth, unsigned int WindowHeight);
 
-    void BindForWriting();
-
-    void BindForReading();
+    void StartFrame();
+    void BindForGeomPass();
+    void BindForStencilPass();
+    void BindForLightPass();
+    void BindForFinalPass();
 
 private:
 
     GLuint m_fbo;
     GLuint m_textures[GBUFFER_NUM_TEXTURES];
     GLuint m_depthTexture;
+    GLuint m_finalTexture;
 };
 
 #endif /* GBUFFER_H */
