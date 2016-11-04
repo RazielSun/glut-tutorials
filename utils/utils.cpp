@@ -141,7 +141,7 @@ void Matrix4f::InitRotateTransform(float rotateX, float rotateY, float rotateZ)
     rz.m[2][0] = 0.0f   ; rz.m[2][1] = 0.0f    ; rz.m[2][2] = 1.0f; rz.m[2][3] = 0.0f;
     rz.m[3][0] = 0.0f   ; rz.m[3][1] = 0.0f    ; rz.m[3][2] = 0.0f; rz.m[3][3] = 1.0f;
 
-    *this = rx * ry * rz;
+    *this = rz * ry * rx;
 }
 
 void Matrix4f::InitTranslationTransform(const Vector3f& pos)
