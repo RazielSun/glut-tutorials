@@ -3,7 +3,7 @@ const int MAX_BONES = 100;
 attribute vec3 position;
 attribute vec2 texCoord;
 attribute vec3 normal;
-attribute ivec4 BoneIDs;
+attribute vec4 BoneIDs;
 attribute vec4 Weights;
 
 uniform mat4 WVP;
