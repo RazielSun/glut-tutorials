@@ -52,6 +52,10 @@ void Render ()
 
 	mesh->BoneTransform(RunningTime, Transforms);
 
+	for (uint i = 0 ; i < Transforms.size() ; i++) {
+        program->SetBoneTransform(i, Transforms[i]);
+    }
+
 	Pipeline p;
 	p.Pos(0.0f, 0.0f, 6.0f);
 	p.Scale(0.1f, 0.1f, 0.1f);

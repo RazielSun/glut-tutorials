@@ -2,6 +2,7 @@
 #include "skinning_program.h"
 #include "shader_program.h"
 #include <cstdio>
+#include <assert.h>
 
 SkinningProgram::SkinningProgram()
 {
@@ -38,7 +39,7 @@ void SkinningProgram::BindAttrs()
 
 void SkinningProgram::SetBoneTransform(uint Index, const Matrix4f& Transform)
 {
-	// assert(Index < MAX_BONES);
- //    //Transform.Print();
- //    glUniformMatrix4fv(m_boneLocation[Index], 1, GL_TRUE, (const GLfloat*)Transform);  
+	assert(Index < MAX_BONES);
+    //Transform.Print();
+    glUniformMatrix4fv(m_bones[Index], 1, GL_TRUE, (const GLfloat*)Transform.m);  
 }

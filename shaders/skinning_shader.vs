@@ -16,8 +16,21 @@ varying vec3 worldPos0;
 
 void main()
 {
-	gl_Position = WVP * vec4(position, 1.0);
-	uvCoord = texCoord;
-	normal0 = (world * vec4(normal, 0.0)).xyz;
-	worldPos0 = (world * vec4(position, 1.0)).xyz;
+	mat4 BoneTransform = Bones[int(BoneIDs[0])] * Weights[0];
+    BoneTransform     += Bones[int(BoneIDs[1])] * Weights[1];
+    BoneTransform     += Bones[int(BoneIDs[2])] * Weights[2];
+    BoneTransform     += Bones[int(BoneIDs[3])] * Weights[3];
+
+    vec4 PosL    = BoneTransform * vec4(position, 1.0);
+    gl_Position  = WVP * PosL;
+
+    //vec4 NormalL = BoneTransform * vec4(normal, 0.0);
+
+	//uvCoord = texCoord;
+	//normal0 = (world * vec4(NormalL, 0.0)).xyz;
+	//worldPos0 = (world * vec4(PosL, 1.0)).xyz;
+
+    uvCoord = texCoord;
+    normal0 = (world * vec4(normal, 0.0)).xyz;
+    worldPos0 = (world * vec4(position, 1.0)).xyz;
 }
