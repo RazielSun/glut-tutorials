@@ -9,7 +9,7 @@
 #include "utils/camera.h"
 #include "utils/pipeline.h"
 #include "utils/lights_common.h"
-#include "utils/light_program.h"
+#include "utils/skinning_program.h"
 #include "utils/skinned_mesh.h"
 
 #include <GL/glew.h>
@@ -27,17 +27,30 @@ Camera* camera = NULL;
 
 DirectionLight directionLight;
 
-LightProgram* lightProgram = NULL;
+SkinningProgram* program = NULL;
 
 SkinnedMesh* mesh = NULL;
 
 static float scale = 0.0f;
+static long long m_startTime = 0;
+
+float GetRunningTime()
+{
+    float RunningTime = (float)((double)GetCurrentTimeMillis() - (double)m_startTime) / 1000.0f;
+    return RunningTime;
+}
 
 void Render ()
 {
 	camera->OnRender();
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	float RunningTime = GetRunningTime();
+
+	std::vector<Matrix4f> Transforms;
+
+	mesh->BoneTransform(RunningTime, Transforms);
 
 	Pipeline p;
 	p.Pos(0.0f, 0.0f, 6.0f);
@@ -46,24 +59,24 @@ void Render ()
 	p.SetCamera(*camera);
     p.SetPerspectiveProj(projInfo); 
 	
-	lightProgram->SetWVP(p.GetTrans());
-	lightProgram->SetWorld(p.GetWorldTrans());
+	program->SetWVP(p.GetTrans());
+	program->SetWorld(p.GetWorldTrans());
 
 	mesh->Render();
 }
 
-void createLightProgram ()
+void createProgram ()
 {
-	lightProgram = new LightProgram();
-	if (!lightProgram->Init()) {
+	program = new SkinningProgram();
+	if (!program->Init()) {
 		exit(1);
 	}
-	lightProgram->AddShader(GL_VERTEX_SHADER, "shaders/light_shader.vs");
-	lightProgram->AddShader(GL_FRAGMENT_SHADER, "shaders/light_shader.fs");
-	lightProgram->Compile();
-	lightProgram->Link();
-	lightProgram->SetDirectionLight(directionLight);
-    lightProgram->Enable();
+	program->AddShader(GL_VERTEX_SHADER, "shaders/skinning_shader.vs");
+	program->AddShader(GL_FRAGMENT_SHADER, "shaders/skinning_shader.fs");
+	program->Compile();
+	program->Link();
+	program->SetDirectionLight(directionLight);
+    program->Enable();
 }
 
 SDL_Window *window;
@@ -102,7 +115,7 @@ void Init()
 void InitLights ()
 {
 	directionLight.AmbientIntensity = 0.55f;
-	directionLight.Color = COLOR_CYAN;
+	directionLight.Color = COLOR_YELLOW;
 	directionLight.DiffuseIntensity = 0.9f;
 	directionLight.Direction = Vector3f(1.0f, 0.0f, 0.0f);
 }
@@ -120,7 +133,7 @@ int main (int argc, char *argv[])
     projInfo.Width = WINDOW_WIDTH;
     projInfo.Height = WINDOW_HEIGHT;
 	
-	createLightProgram();
+	createProgram();
 
 	mesh = new SkinnedMesh();
 	if (!mesh->LoadMesh("content/boblampclean.md5mesh")) {
@@ -133,6 +146,7 @@ int main (int argc, char *argv[])
     glEnable(GL_CULL_FACE);
     glEnable(GL_DEPTH_TEST);
 
+    m_startTime = GetCurrentTimeMillis();
 	bool running = true;
 
 	while(running)

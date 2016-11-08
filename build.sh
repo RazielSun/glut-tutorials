@@ -25,4 +25,5 @@ utils/deferred_light_program.cpp \
 utils/deferred_dir_light_program.cpp \
 utils/deferred_point_light_program.cpp \
 utils/skinned_mesh.cpp \
+utils/skinning_program.cpp \
 `Magick++-config --ldflags --libs`

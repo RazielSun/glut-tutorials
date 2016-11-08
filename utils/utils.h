@@ -6,8 +6,10 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <assimp/Importer.hpp>
 
 bool ReadFile(const char* fileName, std::string& outFile);
+long long GetCurrentTimeMillis();
 
 #define ARRAY_SIZE_IN_ELEMENTS(a) (sizeof(a)/sizeof(a[0]))
 
@@ -186,6 +188,27 @@ public:
 		return ret;
 	}
 
+	void SetZero()
+    {
+        ZERO_MEM(m);
+    }
+
+    void UpdateFromAssimpMatrix4x4(const aiMatrix4x4& AssimpMatrix)
+    {
+        m[0][0] = AssimpMatrix.a1; m[0][1] = AssimpMatrix.a2; m[0][2] = AssimpMatrix.a3; m[0][3] = AssimpMatrix.a4;
+        m[1][0] = AssimpMatrix.b1; m[1][1] = AssimpMatrix.b2; m[1][2] = AssimpMatrix.b3; m[1][3] = AssimpMatrix.b4;
+        m[2][0] = AssimpMatrix.c1; m[2][1] = AssimpMatrix.c2; m[2][2] = AssimpMatrix.c3; m[2][3] = AssimpMatrix.c4;
+        m[3][0] = AssimpMatrix.d1; m[3][1] = AssimpMatrix.d2; m[3][2] = AssimpMatrix.d3; m[3][3] = AssimpMatrix.d4;
+    }
+    
+    void UpdateFromAssimpMatrix3x3(const aiMatrix3x3& AssimpMatrix)
+    {
+        m[0][0] = AssimpMatrix.a1; m[0][1] = AssimpMatrix.a2; m[0][2] = AssimpMatrix.a3; m[0][3] = 0.0f;
+        m[1][0] = AssimpMatrix.b1; m[1][1] = AssimpMatrix.b2; m[1][2] = AssimpMatrix.b3; m[1][3] = 0.0f;
+        m[2][0] = AssimpMatrix.c1; m[2][1] = AssimpMatrix.c2; m[2][2] = AssimpMatrix.c3; m[2][3] = 0.0f;
+        m[3][0] = 0.0f           ; m[3][1] = 0.0f           ; m[3][2] = 0.0f           ; m[3][3] = 1.0f;
+    }  
+
 	void InitIdentity();
 	void InitScaleTransform(float scaleX, float scaleY, float scaleZ);
     void InitRotateTransform(float rotateX, float rotateY, float rotateZ);
@@ -194,5 +217,6 @@ public:
     void InitPerspectiveProj(float fov, int width, int height, float near, float far);
     void InitCameraTransform(const Vector3f& target, const Vector3f& up);
 };
+
 
 #endif /* UTILS_H */

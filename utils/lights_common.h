@@ -63,5 +63,6 @@ struct DirectionLightGL : public BaseLightGL {
 #define COLOR_GREEN Vector3f(0.0f, 1.0f, 0.0f)
 #define COLOR_CYAN Vector3f(0.0f, 1.0f, 1.0f)
 #define COLOR_BLUE Vector3f(0.0f, 0.0f, 1.0f)
+#define COLOR_YELLOW Vector3f(1.0f, 1.0f, 0.0f)
 
 #endif /* LIGHTS_COMMON_H */

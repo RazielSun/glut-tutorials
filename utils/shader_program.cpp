@@ -60,14 +60,18 @@ bool ShaderProgram::AddShader(GLenum shaderType, const char* fileName)
     return true;
 }
 
+void ShaderProgram::BindAttrs()
+{
+    glBindAttribLocation(m_shaderProgram, 0, "position");
+    glBindAttribLocation(m_shaderProgram, 1, "texCoord");
+    glBindAttribLocation(m_shaderProgram, 2, "normal");
+}
+
 void ShaderProgram::Compile()
 {
 	GLint success = 0;
 
-	glBindAttribLocation(m_shaderProgram, 0, "position");
-    glBindAttribLocation(m_shaderProgram, 1, "texCoord");
-    glBindAttribLocation(m_shaderProgram, 2, "normal");
-    glBindAttribLocation(m_shaderProgram, 3, "tangent");
+	BindAttrs();
 
     glLinkProgram(m_shaderProgram);
     glGetProgramiv(m_shaderProgram, GL_LINK_STATUS, &success);

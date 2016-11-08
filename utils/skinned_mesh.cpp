@@ -8,8 +8,18 @@
 #define BONE_ID_LOCATION        3
 #define BONE_WEIGHT_LOCATION    4
 
-SkinnedMesh::SkinnedMesh()
+void SkinnedMesh::VertexBoneData::AddBoneData(uint BoneID, float Weight)
 {
+    for (uint i = 0 ; i < ARRAY_SIZE_IN_ELEMENTS(IDs) ; i++) {
+        if (Weights[i] == 0.0) {
+            IDs[i]     = BoneID;
+            Weights[i] = Weight;
+            return;
+        }        
+    }
+    
+    // should never get here - more bones than we have space for
+    assert(0);
 }
 
 SkinnedMesh::~SkinnedMesh()
@@ -60,6 +70,7 @@ bool SkinnedMesh::InitFromScene(const aiScene* scene, const std::string& fileNam
     std::vector<Vector3f> Positions;
     std::vector<Vector2f> UVS;
     std::vector<Vector3f> Normals;
+    std::vector<VertexBoneData> Bones;
 
     uint NumVertices = 0;
     uint NumIndices = 0;
@@ -79,11 +90,12 @@ bool SkinnedMesh::InitFromScene(const aiScene* scene, const std::string& fileNam
     Positions.reserve(NumVertices);
     UVS.reserve(NumVertices);
     Normals.reserve(NumVertices);
+    Bones.reserve(NumVertices);
 
     for (uint i = 0; i < m_Entries.size(); i++)
     {
         const aiMesh* mesh = scene->mMeshes[i];
-        InitMesh(i, mesh, Indices, Positions, UVS, Normals);
+        InitMesh(i, mesh, Indices, Positions, UVS, Normals, Bones);
     }
         
 	if (!InitMaterials(scene, fileName)) {
@@ -108,6 +120,14 @@ bool SkinnedMesh::InitFromScene(const aiScene* scene, const std::string& fileNam
     glEnableVertexAttribArray(NORMAL_LOCATION);
     glVertexAttribPointer(NORMAL_LOCATION, 3, GL_FLOAT, GL_FALSE, 0, 0);
 
+    glBindBuffer(GL_ARRAY_BUFFER, m_buffers[BONE_VB]);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(Bones[0]) * Bones.size(), &Bones[0], GL_STATIC_DRAW);
+    glEnableVertexAttribArray(BONE_ID_LOCATION);
+    glVertexAttribIPointer(BONE_ID_LOCATION, 4, GL_INT, sizeof(VertexBoneData), (const GLvoid*)0);
+
+    glEnableVertexAttribArray(BONE_WEIGHT_LOCATION);
+    glVertexAttribPointer(BONE_WEIGHT_LOCATION, 4, GL_FLOAT, GL_FALSE, sizeof(VertexBoneData), (const GLvoid*)16);
+
     return true;
 }
 
@@ -116,7 +136,8 @@ void SkinnedMesh::InitMesh(unsigned int Index,
                         std::vector<uint>& Indices,
                         std::vector<Vector3f>& Positions,
                         std::vector<Vector2f>& UVS,
-                        std::vector<Vector3f>& Normals)
+                        std::vector<Vector3f>& Normals,
+                        std::vector<VertexBoneData>& Bones)
 {
 	const aiVector3D Zero3D(0.0f, 0.0f, 0.0f);
 
@@ -131,6 +152,8 @@ void SkinnedMesh::InitMesh(unsigned int Index,
         Normals.push_back(Vector3f(normal->x, normal->y, normal->z));
 	}
 
+    LoadBones(Index, mesh, Bones);
+
 	for (unsigned int i = 0; i < mesh->mNumFaces; i++)
 	{
 		const aiFace& face = mesh->mFaces[i];
@@ -139,6 +162,60 @@ void SkinnedMesh::InitMesh(unsigned int Index,
 		Indices.push_back(face.mIndices[1]);
 		Indices.push_back(face.mIndices[2]);
 	}
+}
+
+void SkinnedMesh::LoadBones(uint Index, const aiMesh* mesh, std::vector<VertexBoneData>& Bones)
+{
+    for (uint i = 0; i < mesh->mNumBones; i++)
+    {
+        uint BoneIndex = 0;
+        std::string BoneName(mesh->mBones[i]->mName.data);
+
+        if (m_BoneMapping.find(BoneName) == m_BoneMapping.end())
+        {
+            BoneIndex = m_NumBones;
+            m_NumBones++;            
+            BoneInfo bi;            
+            m_BoneInfo.push_back(bi);
+            m_BoneInfo[BoneIndex].BoneOffset.UpdateFromAssimpMatrix4x4(mesh->mBones[i]->mOffsetMatrix);            
+            m_BoneMapping[BoneName] = BoneIndex;
+        }
+        else
+        {
+            BoneIndex = m_BoneMapping[BoneName];
+        }                      
+        
+        for (uint j = 0 ; j < mesh->mBones[i]->mNumWeights ; j++)
+        {
+            uint VertexID = m_Entries[Index].BaseVertex + mesh->mBones[i]->mWeights[j].mVertexId;
+            float Weight  = mesh->mBones[i]->mWeights[j].mWeight;                   
+            Bones[VertexID].AddBoneData(BoneIndex, Weight);
+        }
+    }
+}
+
+void SkinnedMesh::BoneTransform(float TimeInSeconds, std::vector<Matrix4f>& Transforms)
+{
+    Matrix4f Identity;
+    Identity.InitIdentity();
+    
+    float TicksPerSecond = (float)(m_scene->mAnimations[0]->mTicksPerSecond != 0 ? m_scene->mAnimations[0]->mTicksPerSecond : 25.0f);
+    float TimeInTicks = TimeInSeconds * TicksPerSecond;
+    float AnimationTime = std::fmod(TimeInTicks, (float)m_scene->mAnimations[0]->mDuration);
+
+    ReadNodeHeirarchy(AnimationTime, m_scene->mRootNode, Identity);
+
+    Transforms.resize(m_NumBones);
+
+    for (uint i = 0 ; i < m_NumBones ; i++)
+    {
+        Transforms[i] = m_BoneInfo[i].FinalTransformation;
+    }
+}
+
+void SkinnedMesh::ReadNodeHeirarchy(float AnimationTime, const aiNode* pNode, const Matrix4f& ParentTransform)
+{
+    //
 }
 
 bool SkinnedMesh::InitMaterials(const aiScene* scene, const std::string& fileName)
@@ -185,13 +262,6 @@ bool SkinnedMesh::InitMaterials(const aiScene* scene, const std::string& fileNam
                 }
             }
         }
-
-        // if (!m_Textures[i])
-        // {
-        //     m_Textures[i] = new Texture(GL_TEXTURE_2D, "content/white.png");
-
-        //     success = m_Textures[i]->Load();
-        // }
     }
 
     return success;

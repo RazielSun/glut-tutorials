@@ -11,6 +11,7 @@ public:
 
 	virtual bool Init();
 	virtual void Link();
+	virtual void BindAttrs();
 	void Compile();
 
 	void Enable();

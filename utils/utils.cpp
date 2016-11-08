@@ -1,6 +1,7 @@
 
 #include <stdio.h>
 #include "utils.h"
+#include <sys/time.h>
 
 bool ReadFile(const char* fileName, std::string& outFile)
 {
@@ -22,6 +23,16 @@ bool ReadFile(const char* fileName, std::string& outFile)
     }
     
     return success;
+}
+
+
+long long GetCurrentTimeMillis()
+{
+    timeval t;
+    gettimeofday(&t, NULL);
+
+    long long ret = t.tv_sec * 1000 + t.tv_usec / 1000;
+    return ret;
 }
 
 Vector3f Vector3f::Cross(const Vector3f& v)
