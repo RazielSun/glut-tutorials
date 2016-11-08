@@ -68,7 +68,7 @@ bool SkinnedMesh::LoadMesh(const std::string& fileName)
 
 bool SkinnedMesh::InitFromScene(const aiScene* scene, const std::string& fileName)
 {
-	m_Entries.resize(scene->mNumMeshes);
+	m_Entries.resize(scene->mNumMeshes, MeshEntry());
 	m_Textures.resize(scene->mNumMaterials);
 
     std::vector<uint> Indices;
@@ -95,7 +95,7 @@ bool SkinnedMesh::InitFromScene(const aiScene* scene, const std::string& fileNam
     Positions.reserve(NumVertices);
     UVS.reserve(NumVertices);
     Normals.reserve(NumVertices);
-    Bones.reserve(NumVertices);
+    Bones.resize(NumVertices, VertexBoneData());
 
     for (uint i = 0; i < m_Entries.size(); i++)
     {
@@ -250,21 +250,21 @@ void SkinnedMesh::LoadBones(uint Index, const aiMesh* mesh, std::vector<VertexBo
 
 void SkinnedMesh::BoneTransform(float TimeInSeconds, std::vector<Matrix4f>& Transforms)
 {
-    // Matrix4f Identity;
-    // Identity.InitIdentity();
+    Matrix4f Identity;
+    Identity.InitIdentity();
     
-    // float TicksPerSecond = (float)(m_scene->mAnimations[0]->mTicksPerSecond != 0 ? m_scene->mAnimations[0]->mTicksPerSecond : 25.0f);
-    // float TimeInTicks = TimeInSeconds * TicksPerSecond;
-    // float AnimationTime = std::fmod(TimeInTicks, (float)m_scene->mAnimations[0]->mDuration);
+    float TicksPerSecond = (float)(m_scene->mAnimations[0]->mTicksPerSecond != 0 ? m_scene->mAnimations[0]->mTicksPerSecond : 25.0f);
+    float TimeInTicks = TimeInSeconds * TicksPerSecond;
+    float AnimationTime = std::fmod(TimeInTicks, (float)m_scene->mAnimations[0]->mDuration);
 
-    // ReadNodeHeirarchy(AnimationTime, m_scene->mRootNode, Identity);
+    ReadNodeHeirarchy(AnimationTime, m_scene->mRootNode, Identity);
 
-    // Transforms.resize(m_NumBones);
+    Transforms.resize(m_NumBones);
 
-    // for (uint i = 0 ; i < m_NumBones ; i++)
-    // {
-    //     Transforms[i] = m_BoneInfo[i].FinalTransformation;
-    // }
+    for (uint i = 0 ; i < m_NumBones ; i++)
+    {
+        Transforms[i] = m_BoneInfo[i].FinalTransformation;
+    }
 }
 
 void SkinnedMesh::ReadNodeHeirarchy(float AnimationTime, const aiNode* pNode, const Matrix4f& ParentTransform)
