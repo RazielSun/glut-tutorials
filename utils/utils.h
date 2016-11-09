@@ -233,6 +233,13 @@ public:
 	    m[3][0] = 0.0f; m[3][1] = 0.0f; m[3][2] = 0.0f; m[3][3] = 1.0f;
 	}
 
+	void Print() const
+    {
+        for (int i = 0 ; i < 4 ; i++) {
+            printf("%f %f %f %f\n", m[i][0], m[i][1], m[i][2], m[i][3]);
+        }       
+    }
+
 	float Determinant() const;
 	Matrix4f& Inverse();
 

@@ -44,6 +44,8 @@ void Render ()
 {
 	camera->OnRender();
 
+	scale += 0.1f;
+
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	float RunningTime = GetRunningTime();
@@ -51,6 +53,8 @@ void Render ()
 	std::vector<Matrix4f> Transforms;
 
 	mesh->BoneTransform(RunningTime, Transforms);
+
+	// printf("set Bones: %f %lu\n", RunningTime, Transforms.size());
 
 	for (uint i = 0 ; i < Transforms.size() ; i++) {
         program->SetBoneTransform(i, Transforms[i]);

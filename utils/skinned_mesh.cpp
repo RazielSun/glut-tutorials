@@ -128,7 +128,7 @@ bool SkinnedMesh::InitFromScene(const aiScene* scene, const std::string& fileNam
     glBindBuffer(GL_ARRAY_BUFFER, m_buffers[BONE_VB]);
     glBufferData(GL_ARRAY_BUFFER, sizeof(Bones[0]) * Bones.size(), &Bones[0], GL_STATIC_DRAW);
     glEnableVertexAttribArray(BONE_ID_LOCATION);
-    glVertexAttribIPointer(BONE_ID_LOCATION, 4, GL_INT, sizeof(VertexBoneData), (const GLvoid*)0);
+    glVertexAttribPointer(BONE_ID_LOCATION, 4, GL_INT, GL_FALSE, sizeof(VertexBoneData), (const GLvoid*)0);
 
     glEnableVertexAttribArray(BONE_WEIGHT_LOCATION);
     glVertexAttribPointer(BONE_WEIGHT_LOCATION, 4, GL_FLOAT, GL_FALSE, sizeof(VertexBoneData), (const GLvoid*)16);
@@ -303,7 +303,7 @@ void SkinnedMesh::ReadNodeHeirarchy(float AnimationTime, const aiNode* pNode, co
 
     for (uint i = 0; i < pNode->mNumChildren; i++)
     {
-        ReadNodeHeirarchy(AnimationTime, pNode->mChildren[i],GlobalTransformation);
+        ReadNodeHeirarchy(AnimationTime, pNode->mChildren[i], GlobalTransformation);
     }
 }
 

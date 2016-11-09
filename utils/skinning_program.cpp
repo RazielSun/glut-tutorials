@@ -26,6 +26,7 @@ void SkinningProgram::Link()
         memset(name, 0, sizeof(name));
         sprintf(name, "Bones[%d]", i);
         m_bones[i] = GetUniformLocation(name);
+        // printf("Bones [%d] = %d\n", i, m_bones[i]);
 	}
 }
 
@@ -40,6 +41,6 @@ void SkinningProgram::BindAttrs()
 void SkinningProgram::SetBoneTransform(uint Index, const Matrix4f& Transform)
 {
 	assert(Index < MAX_BONES);
-    //Transform.Print();
+    // Transform.Print();
     glUniformMatrix4fv(m_bones[Index], 1, GL_TRUE, (const GLfloat*)Transform.m);  
 }
