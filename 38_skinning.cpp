@@ -31,10 +31,17 @@ DirectionLight directionLight;
 SkinningProgram* program = NULL;
 
 SkinnedOnlyMesh* mesh = NULL;
-SkeletalAnimation* anim = NULL;
+SkeletalAnimation* anims[4];
+std::string AnimNames[] = {
+	"content/assault_combat_idle.FBX",
+	"content/assault_combat_run.FBX",
+	"content/assault_combat_shoot_burst.FBX",
+	"content/assault_combat_shoot.FBX"
+};
 
 static float scale = 0.0f;
 static long long m_startTime = 0;
+static uint animIndex = 0;
 
 float GetRunningTime()
 {
@@ -54,7 +61,7 @@ void Render ()
 
 	std::vector<Matrix4f> Transforms;
 
-	anim->BoneTransform(RunningTime, mesh, Transforms);
+	anims[animIndex]->BoneTransform(RunningTime, mesh, Transforms);
 
 	// printf("set Bones: %f %lu\n", RunningTime, Transforms.size());
 
@@ -65,7 +72,7 @@ void Render ()
 	Pipeline p;
 	p.Pos(0.0f, 0.0f, 6.0f);
 	p.Scale(0.1f, 0.1f, 0.1f);
-	p.Rotate(0.0f, 180.0f, 0.0f);
+	p.Rotate(0.0f, 90.0f, 0.0f);
 	p.SetCamera(*camera);
     p.SetPerspectiveProj(projInfo); 
 	
@@ -150,9 +157,9 @@ int main (int argc, char *argv[])
 		return 1;
 	}
 
-	anim = new SkeletalAnimation();
-	if (!anim->Load("content/assault_combat_idle.FBX")) {
-		return 1;
+	for (uint i = 0; i < 4; i++) {
+		anims[i] = new SkeletalAnimation();
+		anims[i]->Load(AnimNames[i]);
 	}
 
 	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
@@ -186,6 +193,11 @@ int main (int argc, char *argv[])
 					{
 						case SDLK_ESCAPE:
 							running = false;
+							break;
+						case SDLK_z:
+							animIndex++;
+							if (animIndex >= 4)
+								animIndex = 0;
 							break;
 					}
 				}
