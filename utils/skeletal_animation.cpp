@@ -197,7 +197,18 @@ bool SkinnedMesh::InitMaterials(const aiScene* scene, const std::string& fileNam
 
             if (pMaterial->GetTexture(aiTextureType_DIFFUSE, 0, &Path, NULL, NULL, NULL, NULL, NULL) == AI_SUCCESS)
             {
-                std::string FullPath = dir + "/" + Path.data;
+                std::string mPath(Path.data);
+                std::string::size_type uslash = mPath.find_last_of("\\");
+                std::string texturePath;
+
+                if (uslash == std::string::npos || uslash == 0) {
+                    texturePath = "white.png";
+                }
+                else {
+                    texturePath = mPath.substr(uslash+1, sizeof(mPath));
+                }
+
+                std::string FullPath = dir + "/" + texturePath;
                 m_Textures[i] = new Texture(GL_TEXTURE_2D, FullPath.c_str());
 
                 if (!m_Textures[i]->Load())
@@ -220,6 +231,7 @@ bool SkinnedMesh::InitMaterials(const aiScene* scene, const std::string& fileNam
 
 void SkinnedMesh::LoadBones(uint Index, const aiMesh* mesh, std::vector<VertexBoneData>& Bones)
 {
+    printf("Load Bones: %d\n", Index);
     for (uint i = 0; i < mesh->mNumBones; i++)
     {
         uint BoneIndex = 0;

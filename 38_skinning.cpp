@@ -10,7 +10,7 @@
 #include "utils/pipeline.h"
 #include "utils/lights_common.h"
 #include "utils/skinning_program.h"
-#include "utils/skinned_mesh.h"
+#include "utils/skinned_only_mesh.h"
 
 #include <GL/glew.h>
 #include <SDL2/SDL.h>
@@ -29,7 +29,7 @@ DirectionLight directionLight;
 
 SkinningProgram* program = NULL;
 
-SkinnedMesh* mesh = NULL;
+SkinnedOnlyMesh* mesh = NULL;
 
 static float scale = 0.0f;
 static long long m_startTime = 0;
@@ -48,17 +48,17 @@ void Render ()
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	float RunningTime = GetRunningTime();
+	// float RunningTime = GetRunningTime();
 
-	std::vector<Matrix4f> Transforms;
+	// std::vector<Matrix4f> Transforms;
 
-	mesh->BoneTransform(RunningTime, Transforms);
+	// mesh->BoneTransform(RunningTime, Transforms);
 
 	// printf("set Bones: %f %lu\n", RunningTime, Transforms.size());
 
-	for (uint i = 0 ; i < Transforms.size() ; i++) {
-        program->SetBoneTransform(i, Transforms[i]);
-    }
+	// for (uint i = 0 ; i < Transforms.size() ; i++) {
+ //        program->SetBoneTransform(i, Transforms[i]);
+ //    }
 
 	Pipeline p;
 	p.Pos(0.0f, 0.0f, 6.0f);
@@ -143,8 +143,8 @@ int main (int argc, char *argv[])
 	
 	createProgram();
 
-	mesh = new SkinnedMesh();
-	if (!mesh->LoadMesh("content/boblampclean.md5mesh")) {
+	mesh = new SkinnedOnlyMesh();
+	if (!mesh->LoadMesh("content/ToonSoldier.FBX")) {
 		return 1;
 	}
 
