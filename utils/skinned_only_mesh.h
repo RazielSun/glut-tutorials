@@ -17,6 +17,11 @@ public:
 	bool LoadMesh(const std::string& fileName);
 	void Render();
 
+	uint GetNumBones() const;
+	const aiNode* GetRootNode() const;
+	const Matrix4f& GetFinalBoneTransformation(uint Index) const;
+	void SetBoneGlobalTransformation(std::string& NodeName, const Matrix4f& GlobalTransformation);
+
 private:
 	void Clear();
 	bool InitFromScene(const aiScene* scene, const std::string& fileName);

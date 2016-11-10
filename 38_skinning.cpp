@@ -11,6 +11,7 @@
 #include "utils/lights_common.h"
 #include "utils/skinning_program.h"
 #include "utils/skinned_only_mesh.h"
+#include "utils/skeletal_animation.h"
 
 #include <GL/glew.h>
 #include <SDL2/SDL.h>
@@ -30,6 +31,7 @@ DirectionLight directionLight;
 SkinningProgram* program = NULL;
 
 SkinnedOnlyMesh* mesh = NULL;
+SkeletalAnimation* anim = NULL;
 
 static float scale = 0.0f;
 static long long m_startTime = 0;
@@ -48,22 +50,22 @@ void Render ()
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	// float RunningTime = GetRunningTime();
+	float RunningTime = GetRunningTime();
 
-	// std::vector<Matrix4f> Transforms;
+	std::vector<Matrix4f> Transforms;
 
-	// mesh->BoneTransform(RunningTime, Transforms);
+	anim->BoneTransform(RunningTime, mesh, Transforms);
 
 	// printf("set Bones: %f %lu\n", RunningTime, Transforms.size());
 
-	// for (uint i = 0 ; i < Transforms.size() ; i++) {
- //        program->SetBoneTransform(i, Transforms[i]);
- //    }
+	for (uint i = 0 ; i < Transforms.size() ; i++) {
+        program->SetBoneTransform(i, Transforms[i]);
+    }
 
 	Pipeline p;
 	p.Pos(0.0f, 0.0f, 6.0f);
 	p.Scale(0.1f, 0.1f, 0.1f);
-	p.Rotate(270.0f, 180.0f, 0.0f);
+	p.Rotate(0.0f, 180.0f, 0.0f);
 	p.SetCamera(*camera);
     p.SetPerspectiveProj(projInfo); 
 	
@@ -145,6 +147,11 @@ int main (int argc, char *argv[])
 
 	mesh = new SkinnedOnlyMesh();
 	if (!mesh->LoadMesh("content/ToonSoldier.FBX")) {
+		return 1;
+	}
+
+	anim = new SkeletalAnimation();
+	if (!anim->Load("content/assault_combat_idle.FBX")) {
 		return 1;
 	}
 

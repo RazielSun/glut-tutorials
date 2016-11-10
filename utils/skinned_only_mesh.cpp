@@ -280,3 +280,28 @@ void SkinnedOnlyMesh::Render()
 
     glBindVertexArray(0);
 }
+
+uint SkinnedOnlyMesh::GetNumBones() const
+{
+    return m_NumBones;
+}
+
+const aiNode* SkinnedOnlyMesh::GetRootNode() const
+{
+    return m_scene->mRootNode;
+}
+
+const Matrix4f& SkinnedOnlyMesh::GetFinalBoneTransformation(uint Index) const
+{
+    return m_BoneInfo[Index].FinalTransformation;
+}
+
+void SkinnedOnlyMesh::SetBoneGlobalTransformation(std::string& NodeName, const Matrix4f& GlobalTransformation)
+{
+    if (m_BoneMapping.find(NodeName) != m_BoneMapping.end())
+    {
+        uint BoneIndex = m_BoneMapping[NodeName];
+        m_BoneInfo[BoneIndex].FinalTransformation = m_GlobalInverseTransform * GlobalTransformation * m_BoneInfo[BoneIndex].BoneOffset;
+    }
+}
+

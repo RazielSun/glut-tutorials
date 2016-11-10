@@ -27,4 +27,5 @@ utils/deferred_point_light_program.cpp \
 utils/skinned_mesh.cpp \
 utils/skinned_only_mesh.cpp \
 utils/skinning_program.cpp \
+utils/skeletal_animation.cpp \
 `Magick++-config --ldflags --libs`
