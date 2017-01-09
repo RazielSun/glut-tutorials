@@ -14,6 +14,10 @@ public:
 	void LookAt(float x, float y, float z);
 	void OnMouse(int x, int y);
 	bool OnKeyboard(int key);
+	void OnJoyAxis(int axis, int value);
+	void OnJoyButton(int button);
+	void OnJoyHat(int value);
+	void OnUpdate();
 	void OnRender();
 
 	const Vector3f& GetPos() const;
@@ -29,6 +33,10 @@ private:
 
 	float m_AngleH;
 	float m_AngleV;
+
+	float m_AxisValue;
+	bool m_RotateV;
+	bool m_RotateH;
 
 	bool m_OnUpperEdge;
     bool m_OnLowerEdge;

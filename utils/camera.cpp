@@ -89,41 +89,13 @@ void Camera::Init()
     m_mousePos.y = m_windowHeight / 2;
 }
 
-void Camera::OnMouse(int x, int y)
+void Camera::OnUpdate()
 {
-	const int DeltaX = x - m_mousePos.x;
-    const int DeltaY = y - m_mousePos.y;
-
-    m_mousePos.x = x;
-    m_mousePos.y = y;
-
-    m_AngleH += (float)DeltaX / 20.0f;
-    m_AngleV += (float)DeltaY / 20.0f;
-
-    if (DeltaX == 0) {
-        if (x <= MARGIN) {
-            m_OnLeftEdge = true;
-        }
-        else if (x >= (m_windowWidth - MARGIN)) {
-            m_OnRightEdge = true;
-        }
+    if (m_RotateV) {
+        m_AngleV += m_AxisValue;
     }
-    else {
-        m_OnLeftEdge = false;
-        m_OnRightEdge = false;
-    }
-
-    if (DeltaY == 0) {
-        if (y <= MARGIN) {
-            m_OnUpperEdge = true;
-        }
-        else if (y >= (m_windowHeight - MARGIN)) {
-            m_OnLowerEdge = true;
-        }
-    }
-    else {
-        m_OnUpperEdge = false;
-        m_OnLowerEdge = false;
+    if (m_RotateH) {
+        m_AngleH += m_AxisValue;
     }
 
     Update();
@@ -182,6 +154,46 @@ void Camera::OnRender()
     }
 }
 
+void Camera::OnMouse(int x, int y)
+{
+    const int DeltaX = x - m_mousePos.x;
+    const int DeltaY = y - m_mousePos.y;
+
+    m_mousePos.x = x;
+    m_mousePos.y = y;
+
+    m_AngleH += (float)DeltaX / 20.0f;
+    m_AngleV += (float)DeltaY / 20.0f;
+
+    if (DeltaX == 0) {
+        if (x <= MARGIN) {
+            m_OnLeftEdge = true;
+        }
+        else if (x >= (m_windowWidth - MARGIN)) {
+            m_OnRightEdge = true;
+        }
+    }
+    else {
+        m_OnLeftEdge = false;
+        m_OnRightEdge = false;
+    }
+
+    if (DeltaY == 0) {
+        if (y <= MARGIN) {
+            m_OnUpperEdge = true;
+        }
+        else if (y >= (m_windowHeight - MARGIN)) {
+            m_OnLowerEdge = true;
+        }
+    }
+    else {
+        m_OnUpperEdge = false;
+        m_OnLowerEdge = false;
+    }
+
+    Update();
+}
+
 bool Camera::OnKeyboard(int key)
 {
 	bool value = false;
@@ -221,6 +233,74 @@ bool Camera::OnKeyboard(int key)
 	}
 
 	return value;
+}
+
+void Camera::OnJoyAxis(int axis, int value)
+{
+    int delta = value - 128;
+
+    if (delta == 0)
+    {
+        m_AxisValue = 0.0f;
+        m_RotateV = false;
+        m_RotateH = false;
+    }
+    else
+    {
+        m_AxisValue = (float) delta / 32768.0f;
+
+        switch(axis)
+        {
+            case 0:
+            case 2:
+                m_RotateH = true;
+            break;
+            case 1:
+            case 3:
+                m_RotateV = true;
+            break;
+        }
+    }
+
+    Update();
+}
+
+void Camera::OnJoyButton(int button)
+{
+    //
+}
+
+void Camera::OnJoyHat(int value)
+{
+    switch(value)
+    {
+        case 1:
+        {
+            m_pos += (m_target * STEP_SIZE);
+        }
+        break;
+        case 4:
+        {
+            m_pos -= (m_target * STEP_SIZE);
+        }
+        break;
+        case 2:
+        {
+            Vector3f right = m_up.Cross(m_target);
+            right.Normalize();
+            right *= STEP_SIZE;
+            m_pos += right;
+        }
+        break;
+        case 8:
+        {
+            Vector3f left = m_target.Cross(m_up);
+            left.Normalize();
+            left *= STEP_SIZE;
+            m_pos += left;
+        }
+        break;
+    }
 }
 
 const Vector3f& Camera::GetPos() const
