@@ -91,14 +91,20 @@ void Camera::Init()
 
 void Camera::OnUpdate()
 {
+    bool ShouldUpdate = false;
+
     if (m_RotateV) {
         m_AngleV += m_AxisValue;
+        ShouldUpdate = true;
     }
     if (m_RotateH) {
         m_AngleH += m_AxisValue;
+        ShouldUpdate = true;
     }
 
-    Update();
+    if (ShouldUpdate) {
+        Update();
+    }
 }
 
 void Camera::Update()
@@ -242,8 +248,18 @@ void Camera::OnJoyAxis(int axis, int value)
     if (delta == 0)
     {
         m_AxisValue = 0.0f;
-        m_RotateV = false;
-        m_RotateH = false;
+
+        switch(axis)
+        {
+            case 0:
+            case 2:
+                m_RotateH = false;
+            break;
+            case 1:
+            case 3:
+                m_RotateV = false;
+            break;
+        }
     }
     else
     {
@@ -258,6 +274,7 @@ void Camera::OnJoyAxis(int axis, int value)
             case 1:
             case 3:
                 m_RotateV = true;
+                m_AxisValue *= -1;
             break;
         }
     }

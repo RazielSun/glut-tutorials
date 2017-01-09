@@ -228,17 +228,18 @@ int main (int argc, char *argv[])
 					printf("axis: %d value: %d\n", event.jaxis.axis, event.jaxis.value);
 				break;
 				case SDL_JOYBUTTONDOWN: // all buttons
-					switch(event.jbutton.button)
-					{
-						case 0:
-						case 1:
-						case 2:
-						case 3:
-							animIndex++;
-							if (animIndex >= 4)
-								animIndex = 0;
-						break;
-					}
+				case SDL_JOYBUTTONUP:
+					// switch(event.jbutton.button)
+					// {
+					// 	case 0:
+					// 	case 1:
+					// 	case 2:
+					// 	case 3:
+					// 		animIndex++;
+					// 		if (animIndex >= 4)
+					// 			animIndex = 0;
+					// 	break;
+					// }
 					printf("joy button: %d state: %d\n", event.jbutton.button, event.jbutton.state);
 				break;
 				case SDL_JOYHATMOTION: // cross
