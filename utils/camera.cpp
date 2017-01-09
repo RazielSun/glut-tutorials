@@ -291,17 +291,17 @@ void Camera::OnJoyHat(int value)
 {
     switch(value)
     {
-        case 1:
+        case 11:
         {
             m_pos += (m_target * STEP_SIZE);
         }
         break;
-        case 4:
+        case 12:
         {
             m_pos -= (m_target * STEP_SIZE);
         }
         break;
-        case 2:
+        case 14:
         {
             Vector3f right = m_up.Cross(m_target);
             right.Normalize();
@@ -309,7 +309,7 @@ void Camera::OnJoyHat(int value)
             m_pos += right;
         }
         break;
-        case 8:
+        case 13:
         {
             Vector3f left = m_target.Cross(m_up);
             left.Normalize();
