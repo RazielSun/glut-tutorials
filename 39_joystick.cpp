@@ -225,7 +225,7 @@ int main (int argc, char *argv[])
 				break;
 				case SDL_JOYAXISMOTION: // sticks
 					camera->OnJoyAxis(event.jaxis.axis, event.jaxis.value);
-					printf("axis: %d value: %d\n", event.jaxis.axis, event.jaxis.value);
+					printf("axis: %d value: %d which: %d\n", event.jaxis.axis, event.jaxis.value, event.jbutton.which);
 				break;
 				case SDL_JOYBUTTONDOWN: // all buttons
 				case SDL_JOYBUTTONUP:
@@ -240,11 +240,11 @@ int main (int argc, char *argv[])
 					// 			animIndex = 0;
 					// 	break;
 					// }
-					printf("joy button: %d state: %d\n", event.jbutton.button, event.jbutton.state);
+					printf("joy button: %d state: %d which: %d\n", event.jbutton.button, event.jbutton.state, event.jbutton.which);
 				break;
 				case SDL_JOYHATMOTION: // cross
 					camera->OnJoyHat(event.jhat.value);
-					printf("hat: %d value: %d\n", event.jhat.hat, event.jhat.value);
+					printf("hat: %d value: %d which: %d\n", event.jhat.hat, event.jhat.value, event.jbutton.which);
 				break;
 			}
 		}
